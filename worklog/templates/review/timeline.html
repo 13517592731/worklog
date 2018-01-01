@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<!--[if IE 7]><html class="ie7" lang="zh"><![endif]-->
+<!--[if gt IE 7]><!-->
+<html lang="zh">
+<!--<![endif]-->
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>我的工作历程</title>
+<link href="{% static 'zui/css/style.css' %}" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div style="background: #FFFFFF; height: 30px; border:1px solid #d0e9c6; text-align: center">
+    <span id="left"><img src="{% static 'zui/images/left.png' %}"></span>
+    <span id="year_number"></span>
+    <span id="right"><img src="{% static 'zui/images/right.png' %}"></span>
+</div>
+<div class="content">
+    <div class="wrapper">
+        <div class="light"><i></i></div>
+        <hr class="line-left">
+        <hr class="line-right">
+        <div class="main">
+            <h1 class="title"></h1>
+            <div class="year">
+                <h2><a href="#"></a></h2>
+                <div class="list">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="{% static 'zui/js/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'zui/js/selectFilter.js' %}"></script>
+<script>
+    $(document).ready(function(){
+        $.show_data = function(url, data){
+            $.getJSON(
+                url,
+               {"year": data},
+                function(data){
+                    var content = "工作学习了" + data.times + "小时";
+                    $(".title").html(content);
+                    $("a").html(year + "年");
+                    var i = $("<i></i>");
+                    $("a").append(i);
+                    var list = $(".list")
+                    var year_div = $(".year");
+                    var ul = $("<ul></ul>");
+                    var datas = data.info;
+                    result = 0;
+                    $.each(datas, function (i, item) {
+                        var day = $("<p class=\"date\"></p>");
+                        var li;
+                        var version = $("<p class=\"version\">&nbsp;</p>");
+                        var intro = $("<p class=\"intro\"></p>");
+                        intro.html("学习了" + item[1][1] + "小时");
+                        day.html(item[0]);
+                        if(result==0)
+                            li = $("<li class=\"cls highlight\"></li>")
+                        else
+                            li = $("<li class=\"cls\"></li>")
+                        li.append(day);
+                        li.append(intro);
+                        li.append(version);
+                        var more = $("<div class=\"more\"></div>");
+                        $.each(item[1][0], function(j, items){
+                            var p = $("<p></p>");
+                            p.html(items[0] + "——耗时:" + (items[1]) + "小时");
+                            more.append(p);
+                        })
+                        li.append(more);
+                        ul.append(li);
+                        result += 1;
+                    })
+                    list.append(ul);
+                }
+            );
+        }
+        var myDate = new Date();
+        //获取当前年
+        var year=myDate.getFullYear();
+        $("#year_number").html(year);
+        $.show_data("{% url 'time_show' %}", year);
+        $("#left").click(function(){
+            var str = $("#year_number").html();
+            year = parseInt(str) - 1;
+            $("#year_number").html(year);
+            $(".list").html("");
+            $.show_data("{% url 'time_show' %}",year);
+        })
+        $("#right").click(function(){
+            var str = $("#year_number").html();
+            year = parseInt(str) + 1;
+            $("#year_number").html(year);
+            $(".list").html("");
+            $.show_data("{% url 'time_show' %}",year);
+        })
+    })
+</script>
+<script>
+    $(document).ready(function(){
+        $(".main .year .list").each(function (e, target) {
+            var $target=  $(target),
+                $ul = $target.find("ul");
+            $target.height($ul.outerHeight()), $ul.css("position", "absolute");
+        });
+        $(".main .year>h2>a").click(function (e) {
+            console.log(e.preventDefault())
+            e.preventDefault();
+            $(this).parents(".year").toggleClass("close");
+        });
+    })
+</script>
+</body>
+</html>

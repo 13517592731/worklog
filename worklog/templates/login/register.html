@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% load staticfiles %}
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>注册</title>
+<link rel="stylesheet"  type="text/css" href="{% static 'zui/css/sweetalert.css' %}" />
+<link rel="stylesheet"  type="text/css" href="{% static 'zui/css/css.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'zui/css/zui.min.css'%}" />
+<script type="text/javascript" src="{% static 'zui/lib/jquery/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'zui/js/zui.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'zui/js/sweetalert.js' %}"></script>
+    <script >
+        $('#eye-ico').click(function () {
+            if($('#p').attr("type")=="text"){
+                $('#p').attr("type","password")
+            }
+            else{
+                $('#p').attr("type","text")
+            }
+        })
+
+    </script>
+</head>
+<body background="{% static 'zui/images/login.jpg' %}">
+
+<div>
+ <div class="container">
+    <div class="col-xs-1 col-sm-2 col-md-6 col-lg-9"></div>
+    <div class="col-xs-9 col-sm-6 col-md-3 col-lg-3" style="height:450px;background-color: white; border-radius:10px;opacity: 0.9;">
+        <form method="post"   action="{% url 'user_regist' %}">
+            {% csrf_token %}
+            <br/><br/>
+            <span class="limt-2">&nbsp;&nbsp;注册</span>
+            <br/><br/>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="icon icon-user"></i></span>
+                <input type="text" class="form-control" placeholder="用户名" name="user" value="{{ username }}" required>
+            </div>
+            <br /><br />
+            <div class="input-group">
+                <span class="input-group-addon"><i class="icon icon-user"></i></span>
+                <input type="text" class="form-control" placeholder="您的姓名" name="name" value="{{ name }}" required>
+            </div>
+            <br /><br />
+
+            <div class="input-group">
+                <span class="input-group-addon"><i class="icon icon-lock"></i></span>
+                <input type="password" class="form-control" placeholder="密码" name="pwd" value="{{ pwd }}"required>
+                <span class="input-group-addon"><i   class="icon icon-eye-open"></i></span>
+            </div>
+            <br /><br />
+
+            <div class="input-group">
+                <span class="input-group-addon"><i class="icon icon-lock"></i></span>
+                <input type="password" class="form-control" placeholder="确认密码" name="pwd1" required>
+                <span class="input-group-addon"><i   class="icon icon-eye-open"></i></span>
+            </div>
+            <br /><br />
+            <button class="btn btn-block btn-info"  type="submit">注册</button>
+            <br/><br />
+        </form>
+    </div>
+</div>
+</div><!--nav-top-->
+{% if error %}
+    <script>
+         var err = "{{ error|safe }}";
+         swal("OMG!", err, "error");
+    </script>
+{% endif %}
+</body>
+</html>

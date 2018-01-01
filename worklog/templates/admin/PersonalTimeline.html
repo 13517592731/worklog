@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html><head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>PersonalTimeline</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{% static 'amaze/css/fullcalendar.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'zui/css/zui.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+<script type="text/javascript" src="{% static 'amaze/js/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'zui/js/zui.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'amaze/js/fullcalendar.min.js' %}"></script>
+</head>
+
+<body>
+
+<!--head-->
+<div class="header">
+<nav class="nav navbar-fixed-top" role="navgation" style="background: #FFFFFF;">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="#" class="navbar-brand">
+              worklog
+            </a>
+
+            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav nav" style="font-size: 18px">
+                <li><a href="#"><img src="{% static 'bootstrap/images/主页.png' %}">&nbsp主页 &nbsp</a></li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/项目.png' %}">&nbsp项目 &nbsp</a></li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/日历.png' %}">&nbsp日历 &nbsp </a></li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/记事本.png' %}">&nbsp统计 &nbsp</a></li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/用户.png' %}">&nbsp我的 &nbsp</a></li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/信息.png' %}">&nbsp 通知</a></li>
+            </ul>
+            <div class="navbar-form navbar-right" style="margin-right: 30px;">
+                <input type="text" class="form-control" name="" placeholder="请输入搜索内容">
+                <button class="btn btn-success" style="margin-right: 30px; background-color: #005fb3"><span class="glyphicon glyphicon-search"></span></button>
+            </div>
+        </div>
+    </div>
+</nav>
+</div>
+
+<!--
+注意:这里由于设置了顶部固定导航栏：navbar-fixed-top
+所以，当设置内容页时，顶部导航栏可能会盖住内容。这时需要给内容部分设置一个顶部外边距也可以解决
+<div style="height: 1500px;width: 500px;background-color: red; margin-top: 70px;"></div>
+ -->
+
+<!--main-->
+<div class="mian" style=" padding-top: 80px; height: 800px;  background-color:#e9e9e9;">
+    <!--时间表搜索框-->
+    <div class="input_content" style="padding-left: 80px; padding-top: 15px">
+        <form class="form-inline">
+          <div class="form-group">
+            <label for="exampleInputEmail3">个人时间表：</label>
+            <input type="text" class="form-control" id="exampleInputEmail3" placeholder="请输入姓名">
+            <button type="submit" class="btn btn-default">搜索</button>
+          </div>
+        </form>
+    </div>
+
+    <!--时间表-->
+    <div class="timeline" style="height: 600px; padding-top: 50px; padding-left: 80px;padding-right: 80px">
+        <div class="col-md-7 col-sm-6 col-lg-3">
+            <a class="card" style="width: 250px; height: 180px">
+                <img src="{% static 'zui/images/时间表.png' %}">
+                <div class="card-heading">
+            <p style="text-align: center">罗东杰</p>
+            </div>
+            </a>
+        </div>
+
+        <div class="col-md-7 col-sm-6 col-lg-3">
+            <a class="card" style="width: 250px; height: 180px">
+                <img src="{% static 'zui/images/时间表.png' %}">
+                <div class="card-heading">
+            <p style="text-align: center">罗东杰</p>
+            </div>
+            </a>
+        </div>
+
+        <div class="col-md-7 col-sm-6 col-lg-3">
+            <a class="card" style="width: 250px; height: 180px">
+                <img src="{% static 'zui/images/时间表.png' %}">
+                <div class="card-heading">
+            <p style="text-align: center">罗东杰</p>
+            </div>
+            </a>
+        </div>
+
+        <div class="col-md-7 col-sm-6 col-lg-3">
+            <a class="card" style="width: 250px; height: 180px">
+                <img src="{% static 'zui/images/时间表.png' %}">
+                <div class="card-heading">
+            <p style="text-align: center">罗东杰</p>
+            </div>
+            </a>
+        </div>
+
+        <div class="col-md-7 col-sm-6 col-lg-3">
+            <a class="card" style="width: 250px; height: 180px">
+                <img src="{% static 'zui/images/时间表.png' %}">
+                <div class="card-heading">
+            <p style="text-align: center">罗东杰</p>
+            </div>
+            </a>
+        </div>
+
+        <div class="col-md-7 col-sm-6 col-lg-3">
+            <a class="card" style="width: 250px; height: 180px">
+                <img src="{% static 'zui/images/时间表.png' %}">
+                <div class="card-heading">
+            <p style="text-align: center">罗东杰</p>
+            </div>
+            </a>
+        </div>
+
+        <div class="col-md-7 col-sm-6 col-lg-3">
+            <a class="card" style="width: 250px; height: 180px">
+                <img src="{% static 'zui/images/时间表.png' %}">
+                <div class="card-heading">
+            <p style="text-align: center">罗东杰</p>
+            </div>
+            </a>
+        </div>
+
+        <div class="col-md-7 col-sm-6 col-lg-3">
+            <a class="card" style="width: 250px; height: 180px">
+                <img src="{% static 'zui/images/时间表.png' %}">
+                <div class="card-heading">
+            <p style="text-align: center">罗东杰</p>
+            </div>
+            </a>
+        </div>
+
+
+
+    <!--分页-->
+    <div class="page" style="padding-bottom: 50px; text-align: center">
+    <ul class="pager">
+      <li class="previous"><a href="your/nice/url">«</a></li>
+      <li><a href="your/nice/url">1</a></li>
+      <li><a href="your/nice/url">2</a></li>
+      <li  class="active"><a href="your/nice/url">3</a></li>
+      <li><a href="your/nice/url">4</a></li>
+      <li><a href="your/nice/url">5</a></li>
+      <li class="next"><a href="your/nice/url">»</a></li>
+    </ul>
+    </div>
+
+</div>
+<!--footer-->
+<div class="footer" style="background: #9eacb4; height: 100px; bottom: 0; padding: 20px">
+    <p style="text-align: center; font-family: 'Adobe Caslon Pro Bold'">&copy 广西财经学院  数据挖掘实验室</p>
+    <p style="text-align: center; font-family: 'Adobe Caslon Pro Bold'">
+            邮箱：415540557 &nbsp  电话：18078134492<br/>
+        	地址：广西财经学院明秀校区 &nbsp 2号实验楼205数据挖掘实验室<br /></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,272 @@
+{% extends 'user_base.html' %}
+{% load staticfiles %}
+{% block title %}我的工作日历{% endblock %}
+{% block static %}
+    <link href='{% static 'zui/css/fullcalendar.css' %}' rel='stylesheet'/>
+    <link href='{% static 'zui/lib/datetimepicker/datetimepicker.min.css' %}' rel='stylesheet'/>
+    <script src='{% static 'zui/lib/datetimepicker/datetimepicker.min.js' %}'></script>
+    <script src='{% static 'zui/js/fullcalendar.min.js' %}'></script>
+    <style>
+        body {
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, sans-serif;
+            font-size: 14px;
+            background-color: #f4f7ed;
+        }
+        #calendar {
+            max-width: 85%;
+            margin: 60px auto 0 auto;
+            background-color: #FFFFFF;
+            filter:progid:DXImageTransform.Microsoft.Shadow(color=#909090,direction=120,strength=4);
+            -moz-box-shadow: 2px 2px 10px #909090;
+            -webkit-box-shadow: 2px 2px 10px #909090;
+            box-shadow:2px 2px 10px #909090; margin-top: 50px;
+        }
+        .view_a{
+            color:#4ea5ad;
+            text-decoration: none;
+        }
+        .view_a:visited, link{
+            color:#4cae4c;
+            text-decoration: none;
+        }
+        .view_a:hover{
+            color:#4cae4c;
+            text-decoration: none;
+        }
+        #view{
+            float: left;
+        }
+        .delete_a{
+            color:#E2AFAF;
+            text-decoration: none;
+        }
+        .delete_a:visited, link{
+            color:#cf372b;
+            text-decoration: none;
+        }
+        .delete_a:hover{
+            color:#cf372b;
+            text-decoration: none;
+        }
+        select {
+            border: solid 1px #000;
+            appearance: none;
+            -moz-appearance: none;
+            -webkit-appearance: none;
+            padding-right: 14px;
+            background: url("http://ourjs.github.io/static/2015/arrow.png") no-repeat scroll right center transparent;
+        }
+        select::-ms-expand {
+            display: none;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<script>
+    $(document).ready(function () {
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            eventLimit: 3,
+            eventLimitText: '更多',
+            buttonIcons: true, // show the prev/next text
+            weekNumbers: true,
+            events: function(start, end, callback) {
+                var myevents = [];
+                $.getJSON("{% url 'show' %}",
+                    {
+                        start: start.getTime(), end: end.getTime()
+                    },
+                    function(doc) {
+                        for(var i = 0; i < doc.event.length; i++){
+                            myevents.push( {
+                                title: doc.event[i].content,
+                                start: doc.event[i].start_time,
+                                id: doc.event[i].id,
+                                color: doc.event[i].color
+                            });
+                        };
+                        callback(myevents);
+                    })
+            },
+            dayClick: function (date) {
+                var selDate =$.fullCalendar.formatDate(date,'yyyy-MM-dd');
+                $("#save").attr("title", selDate);
+                $("#add_event").modal({
+                    backdrop: false
+                });
+            },
+            eventClick: function (calEvent) {
+                var name =  calEvent.title;
+                $("#event-title").html(name);
+                $("#view").attr('href', "/mycalendar/details?id="+calEvent.id);//传日程id给详情页面
+                $("#thisEventEdit").attr('href', "/mycalendar/editor?id="+calEvent.id);//传日程id给编辑页面
+                $("#delete").attr('name',calEvent.id);
+                $('#editmodal').modal({
+                    show: true,
+                    backdrop: false
+                })
+            }
+
+        });
+    });
+
+</script>
+<div id='calendar'></div>
+<div class="modal" id="add_event">
+    <div class="modal-dialog" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">关闭</span></button>
+                <h4 class="modal-title"><i class="icon icon-edit"></i>新建日程</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2">日程内容</label>
+                        <div class="col-md-8 col-sm-8">
+                            <input type="text" class="form-control" id="calendar_content">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2">日程类型</label>
+                        <div class="col-md-8 col-sm-8">
+                            <select class="form-control" id="calendar_type">
+                                <option>学习</option>
+                                <option>工作</option>
+                                <option>其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 danger">开始时间</label>
+                        <div class="col-sm-8 col-md-8">
+                            <input type="text" class="form-control form-datetime" id="start_time">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2">结束时间</label>
+                        <div class="col-sm-8 col-md-8">
+                            <input type="text" class="form-control form-datetime" id="end_time">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="save">保存</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal" id="close-modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="editmodal" class="modal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header" style="border: none">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true" id="icon-close">×</span><span class="sr-only">关闭</span></button>
+                <h4 class="modal-title"><i class="icon icon-edit"></i>新的日程</h4>
+                <h4 id="event-title"></h4>
+            </div>
+            <div class="modal-footer">
+                <a class="view_a" id="view" href="javascript:;">查看详情</a>
+                <a class="view_a" href="javascript:;" id="thisEventEdit">编辑</a>
+                <a class="delete_a" id="delete" href="javascript:;">删除</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // 选择时间和日期
+    $(".form-datetime").datetimepicker(
+        {
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0,
+            showMeridian: 1,
+            format: "yyyy-mm-dd hh:ii"
+        });
+    // 或者在初始化时指定外观选项
+    $('[data-toggle="popover"]').popover({
+        tipClass: 'danger'
+    });
+    //提交新日程
+    $(document).ready(function () {
+        $('#save').click(function () {
+            var content = $("#calendar_content").val();
+            var date = $(this).attr("title");
+            var type = $("#calendar_type option:selected").text(); //选中的文本
+            var start_time = $("#start_time").data("datetimepicker").getDate(),
+            start_time = start_time.format("yyyy-MM-dd hh:mm:ss");
+            var end_time = $("#end_time").data("datetimepicker").getDate(),
+            end_time = end_time.format("yyyy-MM-dd hh:mm:ss");
+            var d1 = new Date(start_time.replace(/\-/g, "\/"));
+            var d2 = new Date(end_time.replace(/\-/g, "\/"));
+            if (content == "")
+                swal("OMG!", "内容不能为空", "error");
+            else if (start_time == "")
+                swal("OMG!", "请选择开始时间！", "error");
+            else if (end_time == "")
+                swal("OMG!", "请选择结束时间！", "error");
+            else if (d1 >= d2)
+                swal("OMG!", "开始时间不能大于结束时间！", "error");
+            else {
+                $.ajax({
+                    url: '{% url 'add' %}',
+                    type: 'POST',
+                    data: {"content": content, "type": type, "start_time": start_time, "end_time": end_time, "create_date": date},//返回的数据
+                    success: function (data) {
+                        if (data.status == 1) {
+                            $('#calendar').fullCalendar('refetchEvents');
+                            $("#close-modal").click();
+                            $("#calendar_content").val("");
+                            $("#calendar_type").val("");
+                            $("#start_time").val("");
+                            $("#end_time").val("");
+                        }
+                        else {
+                            swal("OMG!", "请重新选择时间！", "error");
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#delete').click(function () {
+            var id = $(this).attr("name");
+            swal({
+                title: "您确定要删除吗？",
+                text: "您确定要删除这条数据？",
+                type: "warning",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                confirmButtonText: "是的，我要删除",
+                confirmButtonColor: "#ec6c62"
+            }, function() {
+                $.ajax({
+                   url:'{% url 'delete' %}',
+                   type:'POST',
+                   data:{"id":id},
+                   success:function (data) {
+                       if (data.status == 1){
+                           swal("操作成功!", "已成功删除数据！", "success");
+                           $('#calendar').fullCalendar('refetchEvents');
+                           $("#icon-close").click();
+                       } else{
+                           swal("OMG", "删除操作失败了!", "error");
+                       }
+                   }
+                });
+			});
+        });
+    });
+
+</script>
+{% endblock %}
+

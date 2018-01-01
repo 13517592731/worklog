@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+{% load staticfiles %}
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>找回密码</title>
+    <link rel="stylesheet"  type="text/css" href="{% static 'zui/css/sweetalert.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'zui/css/zui.min.css' %}" />
+    <script type="text/javascript" src="{% static 'zui/lib/jquery/jquery.js' %}"></script>.
+    <script type="text/javascript" src="{% static 'zui/js/sweetalert.js' %}"></script>
+    <script type="text/javascript" src="{% static 'zui/js/zui.min.js' %}"></script>
+</head>
+<body background="{% static 'zui/images/login.jpg' %}">
+<div>
+ <div class="container">
+    <div class="col-xs-1 col-sm-2 col-md-6 col-lg-9"></div>
+    <div class="col-xs-9 col-sm-6 col-md-3 col-lg-3" style="background-color:white; border-radius:10px;opacity: 0.9;">
+            <form method="post" action="{% url 'user_edit_pwd' %}">
+                {% csrf_token %}
+            <br/><br/>
+            <div class="input-group" style=" border-bottom: 1px solid #4cae4c;">
+                <span class="input-group-addon" style="border: none;background-color: #FFFFFF">输新密码</span>
+                <input  type="password" name="password1" placeholder="新密码" required style="width:100%;height: 30px;border:none; ">
+            </div><br/>
+            <div class="input-group" style=" border-bottom: 1px solid #4cae4c ">
+                 <span class="input-group-addon" style="border: none;background-color: #FFFFFF">确认密码</span>
+                <input  type="password" name="password2" placeholder="确认密码" required style="width:100%;height: 30px;border:none;">
+            </div><br/><br/>
+            <button class="btn btn-block btn-success" type="submit">确定</button>
+
+            <br/><br/>
+            </form>
+        </div>
+    </div>
+</div><!--nav-top-->
+{% if error %}
+    <script>
+         var err = "{{ error|safe }}";
+         swal("OMG!", err, "error");
+    </script>
+{% endif %}
+</body>
+</html>

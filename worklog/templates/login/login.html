@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+{% load staticfiles %}
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>登录</title>
+    <link rel="stylesheet"  type="text/css" href="{% static 'zui/css/sweetalert.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'zui/css/zui.min.css' %}" />
+    <link rel="stylesheet"  type="text/css" href="{% static 'zui/css/css.css' %}" />
+    <script type="text/javascript" src="{% static 'zui/lib/jquery/jquery.js' %}"></script>.
+    <script type="text/javascript" src="{% static 'zui/js/sweetalert.js' %}"></script>
+    <script type="text/javascript" src="{% static 'zui/js/zui.min.js' %}"></script>
+</head>
+<body background="{% static 'zui/images/login.jpg' %}">
+<div class="container">
+    <div class="col-xs-1 col-sm-2 col-md-6 col-lg-9"></div>
+    <div class="col-xs-9 col-sm-6 col-md-3 col-lg-3" style="height:400px;background-color: white; border-radius:10px;opacity: 0.9;">
+        <form method="post" action="{% url 'user_login' %}">
+            {% csrf_token %}
+            <br/><br/>
+            <span class="limt-2">欢迎登陆</span>
+            <br/><br/><br/>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="icon icon-user"></i></span>
+                <input type="text" class="form-control" placeholder="用户名/邮箱" name="user" required>
+            </div>
+            <br /><br />
+
+            <div class="input-group">
+                <span class="input-group-addon"><i class="icon icon-lock"></i></span>
+                <input type="password" class="form-control" placeholder="密码" name="pwd" required>
+                 <span class="input-group-addon"><i   class="icon icon-eye-open"></i></span>
+            </div>
+            <br /><br/>
+            <input type="checkbox" name="status">
+            <span>记住我</span>
+            <span style="float:right;" ><a href="{% url 'regist' %}" style="text-decoration: none" >&nbsp;&nbsp;|&nbsp;&nbsp;注册</a></span>
+            &nbsp;&nbsp;
+            <span style="float:right;" ><a href="{% url 'ForgetPwd' %}" style="text-decoration: none">忘记密码？</a></span>
+            &nbsp;&nbsp;
+            <br/><br/>
+            <button class="btn btn-block btn-info" type="submit">登录</button>
+            <br/><br/>
+
+            <a href="#" ><img src="{% static 'zui/images/QQ.jpg' %}" style="width: 35px;position: absolute;left:5%;;border-radius:200px;"></a>
+
+            <a href="#"><img src="{% static 'zui/images/weixin.jpg' %}" style="width: 35px;border-radius:200px;position: absolute;left:40%"></a>
+
+            <a href="#"><img src="{% static 'zui/images/timg.jpg' %}" style="width: 40px;border-radius:200px;position: absolute;left: 80%"></a>
+            <br/><br/>
+        </form><!--nav-top-->
+   </div>
+  </div>
+{% if user_error %}
+    <script>
+         var err = "{{ user_error|safe }}";
+         swal("OMG!", err, "error");
+    </script>
+{% endif %}
+</body>
+</html>

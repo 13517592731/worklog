@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html><head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>file upload</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+    <script src="https://cdn.staticfile.org/Plupload/2.1.1/moxie.js"></script>
+<script src="https://cdn.staticfile.org/Plupload/2.1.1/plupload.dev.js"></script>
+<script src="https://cdn.staticfile.org/qiniu-js-sdk/1.0.14-beta/qiniu.js"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'amaze/css/fullcalendar.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'zui/css/zui.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'zui/lib/uploader/zui.uploader.min.css' %}">
+<script type="text/javascript" src="{% static 'amaze/js/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'zui/js/zui.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'amaze/js/fullcalendar.min.js' %}"></script>
+<script  src="{% static 'zui/lib/uploader/zui.uploader.min.js' %}"></script>
+</head>
+
+<body>
+
+<!--head-->
+<div class="header">
+<nav class="nav navbar-fixed-top" role="navgation" style="background: #FFFFFF;">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="#" class="navbar-brand">
+              worklog
+            </a>
+
+            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav nav" style="font-size: 18px">
+                <li><a href="#"><img src="{% static 'bootstrap/images/主页.png' %}">&nbsp主页 &nbsp</a></li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/项目.png' %}">&nbsp项目 &nbsp</a></li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/日历.png' %}">&nbsp日历 &nbsp </a></li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/记事本.png' %}">&nbsp统计 &nbsp</a></li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/用户.png' %}">&nbsp我的 &nbsp</a></li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/信息.png' %}">&nbsp 通知</a></li>
+            </ul>
+            <div class="navbar-form navbar-right" style="margin-right: 30px;">
+                <input type="text" class="form-control" name="" placeholder="请输入搜索内容">
+                <button class="btn btn-success" style="margin-right: 30px; background-color: #005fb3"><span class="glyphicon glyphicon-search"></span></button>
+            </div>
+        </div>
+    </div>
+</nav>
+</div>
+
+<!--
+注意:这里由于设置了顶部固定导航栏：navbar-fixed-top
+所以，当设置内容页时，顶部导航栏可能会盖住内容。这时需要给内容部分设置一个顶部外边距也可以解决
+<div style="height: 1500px;width: 500px;background-color: red; margin-top: 70px;"></div>
+ -->
+
+<!--main-->
+<div class="mian" style=" padding: 100px; background-color:#e9e9e9;">
+    <!--文件上传-->
+    <div id="tableUploader" class="uploader" style="background-color: #ffffff;">
+    <div class="uploader-message text-center">
+    <div class="content"></div>
+    <button type="button" class="close">×</button>
+  </div>
+  <table class="table table-bordered">
+                    <div class="col-md-12">
+                        <div id="container">
+                            <a class="btn btn-default btn-lg " id="pickfiles" href="#" >
+                                <i class="glyphicon glyphicon-plus"></i>
+                                <span>选择文件</span>
+                            </a>
+                            <a class="btn btn-default btn-lg " id="up_load"  href="#" >
+                                <span>确认上传</span>
+                            </a>
+                            <a class="btn btn-default btn-lg " id="stop_load"  href="#" >
+                                <span>暂停上传</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div style="display:none" id="success" class="col-md-12">
+                        <div class="alert-success">
+                            队列全部文件处理完毕
+                        </div>
+                    </div>
+                    <div class="col-md-12 ">
+                        <table class="table table-striped table-hover text-left"   style="margin-top:40px;display:none">
+                            <thead>
+                              <tr>
+                                <th class="col-md-4">Filename</th>
+                                <th class="col-md-2">Size</th>
+                                <th class="col-md-6">Detail</th>
+                              </tr>
+                            </thead>
+                            <tbody id="fsUploadProgress">
+                            </tbody>
+                        </table>
+                    </div>
+  </table>
+</div>
+    <!--图片-->
+
+</div>
+
+<script>
+
+    $(function() {
+        $('#up_load').on('click', function(){
+            uploader.start();
+        });
+        $('#stop_load').on('click', function(){
+            uploader.stop();
+        });
+        var uploader = Qiniu.uploader({
+            disable_statistics_report: false,
+    runtimes: 'html5,flash,html4',
+    browse_button: 'pickfiles',
+    container: 'container',
+    drop_element: 'container',
+    max_file_size: '1000mb',
+    flash_swf_url: 'bower_components/plupload/js/Moxie.swf',
+    dragdrop: true,
+    chunk_size: '4mb',
+    multi_selection: !(moxie.core.utils.Env.OS.toLowerCase() === "ios"),
+    uptoken_url: '{% url 'get_token' %}',
+    // uptoken_func: function(){
+    //     var ajax = new XMLHttpRequest();
+    //     ajax.open('GET', $('#uptoken_url').val(), false);
+    //     ajax.setRequestHeader("If-Modified-Since", "0");
+    //     ajax.send();
+    //     if (ajax.status === 200) {
+    //         var res = JSON.parse(ajax.responseText);
+    //         console.log('custom uptoken_func:' + res.uptoken);
+    //         return res.uptoken;
+    //     } else {
+    //         console.log('custom uptoken_func err');
+    //         return '';
+    //     }
+    // },
+    domain: 'http://ou3b2kevh.bkt.clouddn.com/',
+    get_new_uptoken: false,
+    //downtoken_url: '/downtoken',
+    // unique_names: true,
+    // save_key: true,
+    // x_vars: {
+    //     'id': '1234',
+    //     'time': function(up, file) {
+    //         var time = (new Date()).getTime();
+    //         // do something with 'time'
+    //         return time;
+    //     },
+    // },
+    auto_start: false,
+    log_level: 5,
+    init: {
+      'BeforeChunkUpload': function(up, file) {
+        console.log("before chunk upload:", file.name);
+      },
+      'FilesAdded': function(up, files) {
+        $('table').show();
+        $('#success').hide();
+        plupload.each(files, function(file) {
+          var progress = new FileProgress(file,
+            'fsUploadProgress');
+          progress.setStatus("等待...");
+          progress.bindUploadCancel(up);
+        });
+      },
+      'BeforeUpload': function(up, file) {
+        console.log("this is a beforeupload function from init");
+        var progress = new FileProgress(file, 'fsUploadProgress');
+        var chunk_size = plupload.parseSize(this.getOption(
+          'chunk_size'));
+        if (up.runtime === 'html5' && chunk_size) {
+          progress.setChunkProgess(chunk_size);
+        }
+      },
+      'UploadProgress': function(up, file) {
+        var progress = new FileProgress(file, 'fsUploadProgress');
+        var chunk_size = plupload.parseSize(this.getOption(
+          'chunk_size'));
+        progress.setProgress(file.percent + "%", file.speed,
+          chunk_size);
+      },
+      'UploadComplete': function() {
+        $('#success').show();
+      },
+      'FileUploaded': function(up, file, info) {
+        var progress = new FileProgress(file, 'fsUploadProgress');
+        progress.setComplete(up, info.response);
+        var domain = up.getOption('domain');
+        var res = $.parseJSON(info.response);
+        var sourceLink = domain + res.key;
+        $.ajax({
+            url: "{% url 'download' %}",
+            type: "get",
+            data: {
+                value:res.key,
+
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(){
+                alert("处理完成")
+            }
+        })
+      },
+      'Error': function(up, err, errTip) {
+          $('table').show();
+          var progress = new FileProgress(err.file, 'fsUploadProgress');
+          progress.setError();
+          progress.setStatus(errTip);
+        }
+        // ,
+        // 'Key': function(up, file) {
+        //     var key = "";
+        //     // do something with key
+        //     return key
+        // }
+    }
+  });
+  //uploader.init();
+  uploader.bind('BeforeUpload', function() {
+    console.log("hello man, i am going to upload a file");
+  });
+  uploader.bind('FileUploaded', function() {
+    console.log('hello man,a file is uploaded');
+  });
+  $('#container').on(
+    'dragenter',
+    function(e) {
+      e.preventDefault();
+      $('#container').addClass('draging');
+      e.stopPropagation();
+    }
+  ).on('drop', function(e) {
+    e.preventDefault();
+    $('#container').removeClass('draging');
+    e.stopPropagation();
+  }).on('dragleave', function(e) {
+    e.preventDefault();
+    $('#container').removeClass('draging');
+    e.stopPropagation();
+  }).on('dragover', function(e) {
+    e.preventDefault();
+    $('#container').addClass('draging');
+    e.stopPropagation();
+  });
+
+
+
+  $('#show_code').on('click', function() {
+    $('#myModal-code').modal();
+    $('pre code').each(function(i, e) {
+      hljs.highlightBlock(e);
+    });
+  });
+
+
+  $('body').on('click', 'table button.btn', function() {
+    $(this).parents('tr').next().toggle();
+  });
+
+
+  var getRotate = function(url) {
+    if (!url) {
+      return 0;
+    }
+    var arr = url.split('/');
+    for (var i = 0, len = arr.length; i < len; i++) {
+      if (arr[i] === 'rotate') {
+        return parseInt(arr[i + 1], 10);
+      }
+    }
+    return 0;
+  };
+
+  $('#myModal-img .modal-body-footer').find('a').on('click', function() {
+    var img = $('#myModal-img').find('.modal-body img');
+    var key = img.data('key');
+    var oldUrl = img.attr('src');
+    var originHeight = parseInt(img.data('h'), 10);
+    var fopArr = [];
+    var rotate = getRotate(oldUrl);
+    if (!$(this).hasClass('no-disable-click')) {
+      $(this).addClass('disabled').siblings().removeClass('disabled');
+      if ($(this).data('imagemogr') !== 'no-rotate') {
+        fopArr.push({
+          'fop': 'imageMogr2',
+          'auto-orient': true,
+          'strip': true,
+          'rotate': rotate,
+          'format': 'png'
+        });
+      }
+    } else {
+      $(this).siblings().removeClass('disabled');
+      var imageMogr = $(this).data('imagemogr');
+      if (imageMogr === 'left') {
+        rotate = rotate - 90 < 0 ? rotate + 270 : rotate - 90;
+      } else if (imageMogr === 'right') {
+        rotate = rotate + 90 > 360 ? rotate - 270 : rotate + 90;
+      }
+      fopArr.push({
+        'fop': 'imageMogr2',
+        'auto-orient': true,
+        'strip': true,
+        'rotate': rotate,
+        'format': 'png'
+      });
+    }
+
+    $('#myModal-img .modal-body-footer').find('a.disabled').each(
+      function() {
+
+        var watermark = $(this).data('watermark');
+        var imageView = $(this).data('imageview');
+        var imageMogr = $(this).data('imagemogr');
+
+        if (watermark) {
+          fopArr.push({
+            fop: 'watermark',
+            mode: 1,
+            image: 'http://www.b1.qiniudn.com/images/logo-2.png',
+            dissolve: 100,
+            gravity: watermark,
+            dx: 100,
+            dy: 100
+          });
+        }
+
+        if (imageView) {
+          var height;
+          switch (imageView) {
+            case 'large':
+              height = originHeight;
+              break;
+            case 'middle':
+              height = originHeight * 0.5;
+              break;
+            case 'small':
+              height = originHeight * 0.1;
+              break;
+            default:
+              height = originHeight;
+              break;
+          }
+          fopArr.push({
+            fop: 'imageView2',
+            mode: 3,
+            h: parseInt(height, 10),
+            q: 100,
+            format: 'png'
+          });
+        }
+
+        if (imageMogr === 'no-rotate') {
+          fopArr.push({
+            'fop': 'imageMogr2',
+            'auto-orient': true,
+            'strip': true,
+            'rotate': 0,
+            'format': 'png'
+          });
+        }
+      });
+
+    var newUrl = Qiniu.pipeline(fopArr, key);
+
+    var newImg = new Image();
+    img.attr('src', 'images/loading.gif');
+    newImg.onload = function() {
+      img.attr('src', newUrl);
+      img.parent('a').attr('href', newUrl);
+    };
+    newImg.src = newUrl;
+    return false;
+  });
+
+});
+
+
+
+// domain 为七牛空间（bucket)对应的域名，选择某个空间后，可通过"空间设置->基本设置->域名设置"查看获取
+
+// uploader 为一个 plupload 对象，继承了所有 plupload 的方法，参考http://plupload.com/docs/*---------关于七牛上传代码end-----------*/
+</script>
+
+
+<!--footer-->
+<div class="footer" style="background: #9eacb4; height: 100px; bottom: 0; padding: 20px">
+    <p style="text-align: center; font-family: 'Adobe Caslon Pro Bold'">&copy 广西财经学院  数据挖掘实验室</p>
+    <p style="text-align: center; font-family: 'Adobe Caslon Pro Bold'">
+            邮箱：415540557 &nbsp  电话：18078134492<br/>
+        	地址：广西财经学院明秀校区 &nbsp 2号实验楼205数据挖掘实验室<br /></p>
+</div>
+<script type="text/javascript" src="{% static 'qiniu/jquery.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js'%}"></script>
+<script type="text/javascript" src="{% static 'qiniu/plupload/moxie.js' %}"></script>
+<script type="text/javascript" src="{% static 'qiniu/plupload/plupload.dev.js' %}"></script>
+<!-- <script type="text/javascript" src="bower_components/plupload/js/plupload.full.min.js"></script> -->
+<script type="text/javascript" src="{% static 'qiniu/zh_CN.js' %}"></script>
+<script type="text/javascript" src="{% static 'qiniu/scripts/ui.js' %}"></script>
+<script type="text/javascript" src="{% static 'qiniu/qiniu.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'qiniu/scripts/highlight.js' %}"></script>
+
+<script type="text/javascript">hljs.initHighlightingOnLoad();</script>
+</body>
+</html>

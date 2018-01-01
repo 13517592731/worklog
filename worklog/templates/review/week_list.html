@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'zui/css/zui.min.css' %}">
+    <link href="{% static 'zui/lib/chosen/chosen.min.css' %}" rel="stylesheet">
+    <script src="{% static 'zui/js/jquery.js' %}"></script>
+    <script src="{% static 'zui/js/echarts.min.js' %}"></script>
+    <script src="{% static 'zui/js/zui.min.js' %}"></script>
+    <script src="{% static 'zui/lib/chosen/chosen.min.js' %}"></script>
+</head>
+<body>
+<div>
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-sm-4 col-md-4"></div>
+            <div class="col-sm-3 col-md-2">
+               <span id="left"><i class="icon-2x icon-angle-left"></i></span>
+               <span style="padding: 5px; font-size: 20px;" id="year_number"></span>
+               <span id="right"><i class="icon-2x icon-angle-right"></i></span>
+            </div>
+            <div class="col-sm-3 col-md-2">
+                <select class="chosen-select form-control" id="week">
+                </select>
+            </div>
+            <div class="col-sm-2 col-md-4"></div>
+        </div>
+    </div>
+    <div id="main" class="col-md-12 col-lg-12" style="min-height: 400px; margin-top: 30px;"></div>
+</div>
+<script>
+    $(document).ready(function(){
+        var myDate = new Date();
+        //获取当前年
+        var year=myDate.getFullYear();
+        $("#year_number").html(year + "年");
+        $("#year_number").attr("title", year);
+        for(i=1; i<=52; i++){
+            var opt = $("<option></option>");
+            opt.attr("title", i)
+            opt.text("第" + i + "周");
+            $("#week").append(opt);
+        };
+         $('select.chosen-select').chosen({
+            no_results_text: '没有找到',    // 当检索时没有找到匹配项时显示的提示文本
+            disable_search_threshold: 20, // 10 个以下的选择项则不显示检索框
+            search_contains: true         // 从任意位置开始检索
+        });
+    })
+</script>
+    <script>
+        $(document).ready(function(){
+            var myDate = new Date();
+            //获取当前年
+            var year=myDate.getFullYear();
+            $.result_data = function(data){
+                var datas = [];
+                $.ajax({
+                    url: "{% url 'week_show' %}",
+                    data: {"data": data},
+                    type: "GET",
+                    async: false,
+                    dataType: "json",
+                    success: function(data){
+                        datas = data;
+                    }
+                });
+                title = datas.title;
+                weekday = datas.weekday;
+                $("#week").val(weekday);
+                $("#week").trigger("chosen:updated");
+                var myChart = echarts.init(document.getElementById('main'));
+                var xData = function() {
+                    var data = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+                    return data;
+                }();
+
+                var allData = function() {
+                    var data = [];
+                    data = datas.all_data;
+                    return data;
+                }();
+
+                var otherData = function() {
+                    var data = [];
+                    data = datas.other_data;
+                    return data;
+                }();
+
+                var studyData = function() {
+                    var data = [];
+                    data = datas.study_data;
+                    return data;
+                }();
+
+                var workData = function() {
+                    var data = [];
+                    data = datas.work_data;
+                    return data;
+                }();
+                option = {
+                    //backgroundColor: "#344b58",
+                    "title": {
+                        "text": title + "工作时间图(单位:小时)",
+                        x: "4%",
+                        textStyle: {
+                            color: '#446699',
+                            fontSize: '14'
+                        }
+                    },
+                    "tooltip": {
+                        "trigger": "axis",
+                        "axisPointer": {
+                            "type": "shadow",
+                            textStyle: {
+                                color: "#fff"
+                            }
+
+                        },
+                    },
+                    toolbox: {
+                        feature: {
+                            dataView: {show: true, readOnly: false},
+                            restore: {show: true},
+                            saveAsImage: {show: true}
+                        }
+                    },
+                    "grid": {
+                        "borderWidth": 0,
+                        "top": '25%',
+                        "bottom": '15%',
+                        textStyle: {
+                            color: "#fff"
+                        }
+                    },
+                    "legend": {
+                        x: '30%',
+                        //top: '2%',
+                        textStyle: {
+                            color: '#90979c',
+                        },
+                        "data": ['工作', '学习', '其他', '总时间']
+                    },
+
+
+                    "calculable": true,
+                    "xAxis": [{
+                        "type": "category",
+                        "axisLine": {
+                            lineStyle: {
+                                color: '#90979c'
+                            }
+                        },
+                        "splitLine": {
+                            "show": false
+                        },
+                        "axisTick": {
+                            "show": false
+                        },
+                        "splitArea": {
+                            "show": false
+                        },
+                        "axisLabel": {
+                            "interval": 0,
+                        },
+                        "data": xData,
+                    }],
+                    "yAxis": [{
+                        "type": "value",
+                        "splitLine": {
+                            "show": false
+                        },
+                        "axisLine": {
+                            lineStyle: {
+                                color: '#90979c'
+                            }
+                        },
+                        "axisTick": {
+                            "show": false
+                        },
+                        "axisLabel": {
+                            "interval": 0,
+
+                        },
+                        "splitArea": {
+                            "show": false
+                        },
+
+                    }],
+
+                    "series": [{
+                        "name": "工作",
+                        "type": "bar",
+                        "stack": "总数",
+                        "barMaxWidth": 25,
+                        "barGap": "20%",
+                        "itemStyle": {
+                            "normal": {
+                                "color": "#1F77B4",
+                                "label": {
+                                    "show": true,
+                                    "textStyle": {
+                                        "color": "#fff"
+                                    },
+                                    "position": "insideTop",
+                                    formatter: function(p) {
+                                        return p.value > 0 ? (p.value) : '';
+                                    }
+                                }
+                            }
+                        },
+                        "data": workData,
+                    },{
+                        "name": "学习",
+                        "type": "bar",
+                        "stack": "总数",
+                        "itemStyle": {
+                            "normal": {
+                                "color": "#FF7F0E",
+                                "barBorderRadius": 0,
+                                "label": {
+                                    "show": true,
+                                    "position": "inside",
+                                    formatter: function(p) {
+                                        return p.value > 0 ? (p.value) : '';
+                                    }
+                                }
+                            }
+                        },
+                        "data": studyData
+                    }, {
+                        "name": "其他",
+                        "type": "bar",
+                        "stack": "总数",
+                        "itemStyle": {
+                            "normal": {
+                                "color": "#2CA02C",
+                                "barBorderRadius": 0,
+                                "label": {
+                                    "show": true,
+                                    "position": "top",
+                                    formatter: function(p) {
+                                        return p.value > 0 ? (p.value) : '';
+                                    }
+                                }
+                            }
+                        },
+                        "data": otherData
+                    },{
+                        "name": "总时间",
+                        "type": "line",
+                        "stack": "总数",
+                        symbolSize:8,
+                        symbol:'circle',
+                        "itemStyle": {
+                            "normal": {
+                                "color": "#6ca7e2",
+                                "barBorderRadius": 0,
+                                "label": {
+                                    "show": true,
+                                    "position": "top",
+                                    formatter: function(p) {
+                                        return p.value > 0 ? (p.value) : '';
+                                    }
+                                }
+                            }
+                        },
+                        "data": allData
+                    },
+                    ]
+                }
+                myChart.setOption(option);
+            };
+            $.result_data([year, "now_week"]);
+            $("#left").click(function(){
+                var str = $("#year_number").html();
+                year = parseInt(str) - 1;
+                $("#year_number").html(year + "年");
+                $("#year_number").attr("title", year);
+                week = $("#week").val().match(/(\d)+/g)[0];
+                $.result_data([year, week])
+            })
+            $("#right").click(function(){
+                var str = $("#year_number").html();
+                year = parseInt(str) + 1;
+                $("#year_number").html(year + "年");
+                $("#year_number").attr("title", year);
+                week = $("#week").val().match(/(\d)+/g)[0];
+                $.result_data([year, week])
+            })
+            $('select.chosen-select').on('change', function(){
+                week = $(this).val();
+                //提取数字
+                week = week.match(/(\d)+/g)[0];
+                year = $("#year_number").attr("title");
+                $.result_data([year, week])
+            });
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>后台登陆</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="alternate icon" type="image/png" href="{% static 'amaze/i/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'amaze/css/amazeui.min.css' %}"/>
+    <script src="{% static 'amaze/js/jquery.min.js' %}"></script>
+    <script src="{% static 'amaze/js/amazeui.min.js' %}"></script>
+    <style>
+        .header {
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 200%;
+            color: #333;
+            margin-top: 30px;
+        }
+        .header p {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="am-g">
+        <h1>Work log 后台系统</h1>
+    </div>
+    <hr />
+</div>
+<div class="am-g">
+    <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
+        <h3>后台登录</h3>
+        <hr>
+        <div class="am-btn-group">
+            <a href="javascript:;" class="am-btn am-btn-secondary am-btn-sm"><i class="am-icon-github am-icon-sm"></i> Github</a>
+            <a href="javascript:;" class="am-btn am-btn-success am-btn-sm"><i class="am-icon-google-plus-square am-icon-sm"></i> Google+</a>
+            <a href="javascript:;" class="am-btn am-btn-primary am-btn-sm"><i class="am-icon-stack-overflow am-icon-sm"></i> stackOverflow</a>
+        </div>
+        <br>
+        <br>
+
+        <form method="post" class="am-form" action="{% url 'admin_login' %}" id="doc-vld-msg">
+            {% csrf_token %}
+            <!--csrf_token：生成令牌-->
+            <fieldset>
+                <div class="am-form-group">
+                    <label for="user">用户名：</label>
+                    <input type="text" name="user"  value="" required >
+                    {% if user_error %}
+                        <div class="am-alert am-alert-danger error">{{ user_error }}</div>
+                    {% endif %}
+                </div>
+                <div class="am-form-group">
+                    <label for="password">密码:</label>
+                    <input type="password" name="pwd" value="" required>
+                    {% if pwd_error %}
+                        <div class="am-alert am-alert-danger error" >{{ pwd_error }}</div>
+                    {% endif %}
+                </div>
+                <div class="am-form-group">
+                    <label for="remember-me">
+                        <input id="remember-me" type="checkbox" name="status">
+                        记住密码
+                    </label>
+                </div>
+                <div class="am-cf">
+                    <input type="submit" name="" value="登 录" class="am-btn am-btn-primary am-btn-sm am-fl">
+                    <input type="button" name="" value="忘记密码 ^_^? " class="am-btn am-btn-default am-btn-sm am-fr" onclick="$.ForgetPwd()">
+                </div>
+            </fieldset>
+        </form>
+        <hr>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $(".error").hide()
+        }, 3000)
+        $.ForgetPwd = function () {
+            window.location.href = "{% url 'ForgetPwd' %}"
+        }
+    })
+</script>
+</body>
+</html>

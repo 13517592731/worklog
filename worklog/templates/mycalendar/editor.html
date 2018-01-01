@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>编辑</title>
+    <link href ='{% static 'zui/css/zui.min.css'%}' rel="stylesheet" >
+    <link href ='{% static 'zui/lib/datatable/zui.datatable.css'%}' rel="stylesheet" >
+    <script src='{% static 'zui/js/jquery.js' %}'></script>
+    <script src='{% static 'zui/js/zui.min.js' %}'></script>
+</head>
+<body>
+
+      <h3 class="text-green">新的日程安排</h3>
+      <hr>
+      <label for="exampleInputAccount4" class="col-sm-2">日历</label>
+      <div class="ke-container ke-container-default" style="width: 854px;">
+          <div style="display:block;" class="ke-toolbar" unselectable="on">
+              <span class="ke-outline" data-name="fontname" title="字体" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-fontname" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="fontsize" title="文字大小" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-fontsize" unselectable="on"></span>
+              </span>
+              <span class="ke-inline-block ke-separator"></span>
+              <span class="ke-outline" data-name="forecolor" title="文字颜色" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-forecolor" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="hilitecolor" title="文字背景" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-hilitecolor" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="bold" title="粗体(Ctrl+B)" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-bold" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="italic" title="斜体(Ctrl+I)" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-italic" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="underline" title="下划线(Ctrl+U)" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-underline" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="removeformat" title="删除格式" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-removeformat" unselectable="on"></span>
+              </span>
+              <span class="ke-inline-block ke-separator"></span>
+              <span class="ke-outline ke-selected" data-name="justifyleft" title="左对齐" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-justifyleft" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="justifycenter" title="居中" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-justifycenter" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="justifyright" title="右对齐" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-justifyright" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="insertorderedlist" title="编号" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-insertorderedlist" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="insertunorderedlist" title="项目符号" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-insertunorderedlist" unselectable="on"></span>
+              </span><span class="ke-inline-block ke-separator"></span>
+              <span class="ke-outline" data-name="emoticons" title="插入表情" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-emoticons" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="image" title="图片" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-image" unselectable="on"></span>
+              </span>
+              <span class="ke-outline" data-name="link" title="超级链接" unselectable="on">
+                  <span class="ke-toolbar-icon ke-toolbar-icon-url ke-icon-link" unselectable="on"></span>
+              </span>
+          </div>
+          <div style="display: block; height: 103px;" class="ke-edit">
+              <iframe class="ke-edit-iframe" hidefocus="true" style="width: 100%; height: 103px;" tabindex="" frameborder="0">
+
+              </iframe>
+              <textarea class="ke-edit-textarea" hidefocus="true" style="width: 100%; height: 103px; display: none;" tabindex=""></textarea>
+          </div>
+          <div class="ke-statusbar">
+              <span class="ke-inline-block ke-statusbar-center-icon"></span>
+              <span class="ke-inline-block ke-statusbar-right-icon" style="visibility: hidden;"></span>
+          </div>
+      </div>
+        <div id="thisevent" name="{{ calendar_id }}">
+            <textarea id="content" name="content" class="form-control kindeditorSimple" style="height:150px;">  {{ content }} </textarea>
+
+        </div>
+      <label>类型：</label><p>{{ type }}</p>
+      <label>开始时间：</label>  <p>{{ start_time }}</p>
+     </br>
+      <div class="pull-left">
+          <p id="editorthis">保存修改</p>
+      </div>
+     <div class="pull-right"><a href="/mycalendar/calendar">取消</a></div>
+<script>
+
+        $(document).ready(function () {
+              $('#editorthis').click(function () {
+                var content = $("#content").val();
+                var event_id = $("#thisevent").attr("name");
+                console.log(content);
+                console.log(event_id);
+                $.ajax({
+                    url:'{% url 'update' %}',
+                    type:'POST',
+                    data:{"content":content,"event_id":event_id},
+                    success:function (data) {
+                        if(data.status == 1){
+                            alert("修改成功！");
+
+                        }
+                    }
+                });
+            });
+
+        });
+</script>
+</body>
+</html>

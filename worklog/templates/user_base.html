@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'zui/css/zui.min.css' %}">
+    <link rel="stylesheet"  type="text/css" href="{% static 'zui/css/sweetalert.css' %}" />
+    <script src="{% static 'zui/lib/jquery/jquery.js' %}"></script>
+    <script type="text/javascript" src="{% static 'zui/js/zui.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'zui/js/sweetalert.js' %}"></script>
+    <style type="text/css">
+       html,body{height:100%;margin:0;padding:0;}
+      .wrap{min-height:100%;}
+      .main{padding-bottom:130px;}/* main的padding-bottom值要等于或大于footer的height值 */
+      .footer{height:100px;margin-top:-100px;background: #9eacb4;;}/* margin-top（负值的）高度等于footer的height值 */
+    </style>
+    {% block static %}
+    {% endblock %}
+</head>
+
+<body>
+<!--head-->
+<div class="wrap">
+    <div class="header" style="height: 50px;margin-bottom: 1px;">
+        <nav class="nav navbar-default" role="navgation" style="background: #FFFFFF">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a href="#" class="navbar-brand">
+                        worklog
+                    </a>
+                    <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav nav" style="font-size: 18px">
+                        <li><a href="#"><img src="{% static 'bootstrap/images/项目.png' %}">&nbsp项目 &nbsp&nbsp</a></li>
+                        <li><a href="{% url 'calendar' %}"><img src="{% static 'bootstrap/images/日历.png' %}">&nbsp日历</span>&nbsp&nbsp </a></li>
+                        <li><a href="{% url 'review_index' %}"><img src="{% static 'bootstrap/images/记事本.png' %}">&nbsp统计</span> &nbsp&nbsp</a></li>
+                        <li class="dropdown">
+                            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown"><img src="{% static 'bootstrap/images/用户.png' %}">&nbsp我的</span> &nbsp&nbsp</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:;" data-toggle="modal" data-target="#profileModal">我的资料</a></li>
+                                <li><a href="{% url 'ForgetPwd' %}">修改密码</a></li>
+                                <li><a href="{% url 'user_logout' %}">退出系统</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#"><img src="{% static 'bootstrap/images/信息.png' %}">&nbsp&nbsp通知</span> &nbsp</a></li>
+                    </ul>
+                    <div class="collapse navbar-collapse navbar-collapse-example">
+                        <!-- 导航中的表单 -->
+                        <ul class="nav navbar-nav navbar-right">
+                            <form class="navbar-form" role="search">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="搜索">
+                                </div>
+                                <button type="submit" class="btn btn-default">搜索</button>
+                            </form>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <!--main-->
+    <div class="main">
+        <div class="mian-top" style="height: 170.483px;">
+            <img src="{% static 'bootstrap/images/11.png' %}" style="width: 100%">
+        </div>
+        <!--中间内容部分-->
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+<!--footer-->
+<div class="footer">
+    <p style="text-align: center; font-family: 'Adobe Caslon Pro Bold'">&copy 广西财经学院  数据挖掘实验室</p>
+    <p style="text-align: center; font-family: 'Adobe Caslon Pro Bold'">
+            邮箱：415540557 &nbsp  电话：18078134492<br/>
+        	地址：广西财经学院明秀校区 &nbsp 2号实验楼205数据挖掘实验室<br />
+    </p>
+</div>
+<div class="modal fade" id="profileModal">
+    <div class="modal-dialog" style="width: 400px">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <h4 class="modal-title"><img width="600px" height="200px" class="img-rounded" alt="圆角图片" id="avator"></h4>
+                <div class="modal-body">
+                    <div class="col-sm-offset-4 col-sm-10">
+                        <h1><p class="text-blue">用户名</p></h1>
+                    </div>
+
+                    <div class="pull-right">
+                        <button type="button" class="btn" data-placement="bottom" data-toggle="modal"data-target="#editProfileModal" data-backdrop="false">
+                            <a><i class="icon icon-camera"></i></a>
+                        </button>
+                        <button type="button" class="btn" data-toggle="modal"data-target="#editProfileModal" data-backdrop="false" data-placement="bottom">
+                            <a><i class="icon icon-edit"></i></a>
+                        </button>
+                    </div>
+
+                    <form class="form-horizontal">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="form-group">
+                                <label class="col-sm-2 text-muted">账号</label>
+                                <div class="col-sm-10">
+                                    <p class="form-control-static" id="username"></p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 text-muted">昵称</label>
+                                <div class="col-sm-10">
+                                    <p class="form-control-static"id="name"></p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 text-muted">邮箱</label>
+                                <div class="col-sm-10">
+                                    <p class="form-control-static" id="email"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="modal fade" id="editProfileModal">
+      <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"></button>
+                  <h5 class="modal-title"><p class="with-padding bg-info"><i class="icon icon-user">编辑资料</i></p></h5>
+              </div>
+              <div class="modal-body">
+                  <form class="form-horizontal">
+                      <div class="form-group">
+                          <div class="col-md-2"></div>
+                          <label for="username_input" class="col-sm-2">账号</label>
+                          <div class="col-md-7 col-sm-10">
+                              <input type="text" class="form-control" id="username_input">
+                          </div>
+                          <div class="col-md-1"></div>
+                      </div>
+                      <div class="form-group">
+                          <div class="col-md-2"></div>
+                          <label for="email_input" class="col-sm-2">邮箱</label>
+                          <div class="col-md-7 col-sm-10">
+                              <input type="email" class="form-control" id="email_input">
+                          </div>
+                          <div class="col-md-1"></div>
+                      </div>
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-success " type="button" id="save">保存</button>
+                  <button class="btn btn-danger " type="button" data-dismiss="modal" id="close_profile">关闭</button>
+              </div>
+          </div>
+      </div>
+</div>
+    <script>
+        $(document).ready(function(){
+            $.getJSON("{% url 'get_userinfo' %}", function(data){
+                $("#username").html(data.username);
+                $("#name").html(data.name);
+                $("#email").html(data.email);
+                $("#username_input").val(data.username);
+                $("#email_input").val(data.email);
+                $("#avator").attr("src", data.avator);
+            });
+        })
+        $("#save").click(function(){
+            var username = $("#username_input").val();
+            var email = $("#email_input").val();
+            if(username == ""){
+                swal("OMG!", "用户不能被修改为空", "error");
+            } else if(email == ""){
+                swal("OMG!", "邮箱不能被修改为空", "error");
+            } else{
+                $.ajax({
+                    url: "{% url 'edit_userinfo' %}",
+                    data: {"username": username, "email": email},
+                    type: "GET",
+                    success: function(data){
+                        if(data.status == true){
+                            $("#close_profile").click();
+                            $("#username").html(username);
+                            $("#email").html(email);
+                        }
+                    }
+                })
+            }
+        })
+    </script>
+</div>
+</body>
+</html>

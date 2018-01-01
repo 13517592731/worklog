@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+{% load staticfiles %}
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<title>注册</title>
+<link rel="stylesheet"  type="text/css" href="{% static 'zui/css/sweetalert.css' %}" />
+<link rel="stylesheet"  type="text/css" href="{% static 'zui/css/css.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'zui/css/zui.min.css' %}" />
+<script type="text/javascript" src="{% static 'zui/lib/jquery/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'zui/js/sweetalert.js' %}"></script>
+<script type="text/javascript" src="{% static 'zui/js/zui.min.js' %}"></script>
+
+</head>
+
+<body background="{% static 'zui/images/time.jpg' %}">
+<div style=" margin: 300px 0;">
+    <div class="container">
+        <div class="col-sm-5 col-md-4"></div>
+        <div class="col-sm-7 col-md-4">
+            <form action="{% url 'test_captch' %}" method="post">
+                {% csrf_token %}
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="icon icon-envelope-alt"></i></span>
+                    <input type="text" class="form-control" placeholder="验证码" name="captch" id="email">
+                </div>
+                <br>
+                <button type="submit" class="btn btn-success btn-block" >下一步</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% if error %}
+    <script>
+         var err = "{{ error|safe }}";
+         swal("OMG!", err, "error");
+    </script>
+{% endif %}
+
+{% if status %}
+    <script>
+         var err = "验证码已成功发送,请赶快完成注册";
+         swal("Good!", err, "success");
+    </script>
+{% endif %}
+<script>
+$(document).ready(function () {
+    $(".btn").attr("disabled", true);
+    $("#email").keyup(function(){
+        if ($(this).val() != ""){
+            $(".btn").attr("disabled", false);
+        } else{
+            $(".btn").attr("disabled", true);
+        }
+    })
+})
+</script>
+</body>
+</html>

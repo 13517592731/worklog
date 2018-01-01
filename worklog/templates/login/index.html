@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>index</title>
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+<link rel="stylesheet" type="text/css" href="{% static 'zui/css/zui.min.css' %}">
+<link rel="stylesheet"  type="text/css" href="{% static 'zui/css/alert.css' %}" />
+<script type="text/javascript" src="{% static 'amaze/js/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'zui/js/zui.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'zui/js/alert.js' %}"></script>
+</head>
+
+<body>
+<!--head-->
+<div class="header">
+<nav class="nav navbar-default" role="navgation" style="background: #FFFFFF;">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="#" class="navbar-brand">
+              worklog
+            </a>
+
+            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav nav" style="font-size: 18px">
+                <li><a href="#"><img src="{% static 'bootstrap/images/项目.png' %}">&nbsp项目 &nbsp&nbsp</a></li>
+                <li><a href="{% url 'calendar' %}"><img src="{% static 'bootstrap/images/日历.png' %}">&nbsp日历</span>&nbsp&nbsp </a></li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/记事本.png' %}">&nbsp统计</span> &nbsp&nbsp</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="{% static 'bootstrap/images/用户.png' %}">&nbsp我的</span> &nbsp&nbsp</a>
+                    <ul class="dropdown-menu">
+					<li><a href="#">我的资料</a></li>
+					<li><a href="#">修改密码</a></li>
+					<li><a href="{% url 'user_logout' %}">退出系统</a></li>
+				</ul>
+                </li>
+                <li><a href="#"><img src="{% static 'bootstrap/images/信息.png' %}">&nbsp&nbsp通知</span> &nbsp</a></li>
+            </ul>
+            <div class="collapse navbar-collapse navbar-collapse-example">
+                <!-- 导航中的表单 -->
+                <ul class="nav navbar-nav navbar-right">
+                    <form class="navbar-form" role="search">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="搜索">
+                        </div>
+                        <button type="submit" class="btn btn-default">搜索</button>
+                    </form>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+</div>
+
+
+<!--main-->
+<div class="mian" style="margin-top: 2px">
+    <div class="mian-top">
+        <img src="{% static 'bootstrap/images/11.png' %}">
+    </div>
+    <!--中间导航-->
+    <div class="main-nav" style="height: 30px">
+    	<nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="example-navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="#">项目 &nbsp&nbsp</a></li>
+                    <li><a href="#">成员 &nbsp&nbsp</a></li>
+                    <li><a href="#">团队 &nbsp&nbsp</a></li>
+                    <li><a href="#">统计 &nbsp&nbsp</a></li>
+                    <li><a href="#">设置</a></li>
+                </ul>
+            </div>
+            </div>
+         </nav>
+    </div>
+
+    <!--中间内容部分-->
+    <div class="main-content" style="height: 600px; background-color:#e9e9e9; padding-left: 170px; padding-top: 40px">
+        <div class="main-content-1" style="height:550px; width: 1000px;">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <a class="btn btn-default" href="#" role="button"><img src="{% static 'bootstrap/images/项目统计.png' %}">项目统计</a>
+                       <a class="btn btn-default" href="#" role="button"><img src="{% static 'bootstrap/images/图表.png' %}">图表统计</a>
+                       <a class="btn btn-default" href="#" role="button"><img src="{% static 'bootstrap/images/时间轴.png' %}">时间轴</a>
+                    </h3>
+                </div>
+                <div class="panel-body" style="background-color: #ffffff; height: 450px">
+                    面板
+                </div>
+             </div>
+    </div>
+    </div>
+
+</div>
+{% if name %}
+    <script>
+         var err = "{{ name|safe }}" + "欢迎进入worklog";
+         TS.successAlert(err);
+    </script>
+{% endif %}
+<!--footer-->
+<div class="footer" style="background: #9eacb4; height: 100px; bottom: 0; padding: 20px">
+    <p style="text-align: center; font-family: 'Adobe Caslon Pro Bold'">&copy 广西财经学院  数据挖掘实验室</p>
+    <p style="text-align: center; font-family: 'Adobe Caslon Pro Bold'">
+            邮箱：415540557 &nbsp  电话：18078134492<br/>
+        	地址：广西财经学院明秀校区 &nbsp 2号实验楼205数据挖掘实验室<br /></p>
+</div>
+</body>

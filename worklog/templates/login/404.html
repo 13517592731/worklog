@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+	<title>找不到页面了</title>
+	 <link rel="stylesheet" href="{% static 'zui/css/zui.min.css' %}">
+      <script src="{% static 'zui/js/jquery.js' %}"></script>
+     <script src="{% static 'zui/js/zui.min.js' %}"></script>
+</head>
+<body>
+<div class="container">
+   <img src="{% static 'zui/images/404.jpg' %}" class="img-responsive">
+   <div class="form-group">
+    <div class="col-sm-offset-4 col-sm-10">
+     <a class="btn btn-primary " type="button" href="{% url 'index' %}">返回首页</a>
+     <a class="btn btn-info " type="button" href="javascript:history.go(-1);">返回上一页</a>
+    </div>
+    </div>
+</div>
+</body>
