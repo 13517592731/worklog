@@ -1,0 +1,94 @@
+*{
+    margin:0;
+    padding:0;
+    text-decoration: none;
+}
+.content-header > #btn{
+    float: right;
+    padding:5px;
+}
+h1{
+    font-family: 'Helvetica Neue', Helvetica, sans-serif;
+    display: block;
+    font-size: 2em;
+    color:#3276b1;
+    -webkit-margin-before: 0.67em;
+    -webkit-margin-after: 0.67em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    font-weight: bold;
+}
+.top{
+    margin-top:20px;
+    margin-left:20px;
+    margin-bottom: 20px;
+}
+.top a{
+    color:#FFFFFF;
+    background: #5cb85c;
+    border-radius:40px;
+    padding:10px;
+}
+.top p{
+    margin-top:60px;
+}
+.member{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width:100%;
+}
+.div-members{
+    width:100%;
+    border-top:1px solid #bdbdbd;
+}
+.div-comment{
+    position: relative;
+    width:100%;
+    padding: 10px 0px;
+    border-bottom:1px solid #bdbdbd;
+}
+
+.detail{
+    left:30px;
+    width:150px;
+}
+.left-padding-info{
+    position: absolute;
+    top:25px;
+    left:300px;
+    color:#5cb85c;
+}
+.right-padding-info{
+    position: absolute;
+    top:25px;
+    left:80%;
+    color:#5cb85c;
+}
+.word{
+    position: absolute;
+    top:25px;
+    left:40%;
+    color:#999966;
+    font-family: 'MicroSoft Yahei', verdana, arial, tahoma;
+}
+.avator {
+    height: 50px;
+    width: 50px;
+    display: block;
+    border-radius: 50%;
+}
+.member-title{
+    width:150px;
+    height:50px;
+}
+.member-title > span{
+    float: left;
+    line-height:50px;
+    margin-left: 10px;
+    color: #d58512;
+    font-family: 'MicroSoft Yahei', verdana, arial, tahoma;
+    font-size:20px;
+}
+.nickname{
+    padding: 0px 5px;
+}

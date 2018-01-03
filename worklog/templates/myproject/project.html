@@ -1,0 +1,52 @@
+{% extends 'user_base.html' %}
+{% load staticfiles %}
+{% block title %}项目主页{% endblock %}
+{% block static %}
+    <link rel="stylesheet" href="{% static 'zui/css/project.css' %}">
+{% endblock %}
+{% block content %}
+<div id="wraps">
+    <div class="projects-tools">
+        <div class="project-groups">
+            <a href="javascript:;" class="project-group project-group-all active"  id="all">我的项目</a>
+            <div class="project-tools-right">
+                <a href="{% url 'create-project' %}" class=" icon-folder-open">新建项目</a>
+            </div>
+        </div>
+    </div>
+    <div id="myproject1">
+    </div>
+</div>
+    <script type="text/javascript">
+        $.project = function (url) {
+            $.ajax({
+                url: url,
+                datatype: 'json',
+                type: 'POST',
+                success:function (data) {
+                    for(var i=0; i<data.data.length; i++){
+                        var a = $("<a></a>");
+                        var url = "{% url 'project_detail' %}?pro_id=" + data.data[i].pro_id;
+                        a.attr('href', url);
+                        var img_icon = $("<img></img>");
+                        img_src = '/static/zui/images/file.jpg';
+                        img_icon.attr('src', img_src);
+                        img_icon.addClass('file');
+                        var p_name = $("<p></p>");
+                        a.addClass('myprojects');
+                        p_name.addClass('name');
+                        p_name.html(data.data[i].pro_name);
+                        a.append(img_icon);
+                        a.append(p_name);
+                        $("#myproject1").append(a);
+                    }
+                }
+            })
+        };
+
+        $(document).ready(function () {
+            $.project('{% url 'all_project' %}');
+        });
+
+    </script>
+{% endblock %}

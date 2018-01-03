@@ -1,29 +1,35 @@
 # -*- coding: UTF-8 -*-
-import re
-import time
 import datetime
 
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+
 from login.models import Profile
-from .models import message, calendar
+from .models import calendar
 
 
 def calendars(request):
     return render(request, "mycalendar/calendar.html")
+
 def details(req):
     calendar_id = req.GET.get('id')
-    content = calendar.objects.get(calendar_id=calendar_id).content
-    start_time = calendar.objects.get(calendar_id=calendar_id).start_time
-    auth_id = req.session.get("user_id")
-    auth_avator = Profile.objects.get(user_id=auth_id).avator
+    calendar_obj = calendar.objects.get(calendar_id=calendar_id)
+    content = calendar_obj.content
+    start_time = calendar_obj.start_time
+    create_date = calendar_obj.create_date
+    auth_id = calendar_obj.auth_id
+    profile_obj = Profile.objects.get(user_id=auth_id)
+    auth_avator = profile_obj.avator
+    name = profile_obj.name
     return render(req,"mycalendar/details.html", {
         'content': content,
         'calendar_id': calendar_id,
         'start_time': start_time,
-       'auth_avator':auth_avator
+        'create_date': create_date,
+       'auth_avator':auth_avator,
+       'title': content + "详情",
+        'name': name
     })
 
 def editor(req):
@@ -84,6 +90,7 @@ def add(req):
         return JsonResponse({"status": 1})
     else:
         return JsonResponse({"status": 0})
+
 
 def StrToDate(date):
     result = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")

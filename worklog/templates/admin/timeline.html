@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}timeline{% endblock %}
+{% block nav %}<li class="active">时间轴</li>{% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="{% static 'timeline/jiaoben1645/css/about.css' %}">
+    <script type="text/javascript" href="{% static 'timeline/jiaoben1645/js/jquery.min_v1.0.js' %}"></script>
+<style>
+.page { width:100%;background:#F0F0F0 repeat-x; }
+</style>
+
+    <div class="am-u-sm-12 am-u-md-11">
+    <div class="page" style="padding-top: 10px; ">
+        <div class="portlet-title">
+            <p style="text-align: center; font-size: 18px;color: #3c3c3c; font-family: 'Adobe 仿宋 Std R'">{{ user_name.name }}的时间轴</p>
+        </div>
+        <div class="box">
+            <ul class="event_year">
+                {% for year in years %}
+                    <li><label for="{{ year }}">{{ year }}</label></li>
+                {% endfor %}
+            </ul>
+            <ul class="event_list">
+            {% for year in years  %}
+                <div>
+                    <h3 id="{{ year }}">{{ year }}</h3>
+                    {% for cal in cals %}
+                        {% ifequal cal.create_year year %}
+                            <li >
+                                <span>{{ cal.create_date }}</span>
+                                <p><span>{{ cal.content }}</span></p>
+                            </li>
+                            <li style="height: 15px"></li>
+                        {% endifequal %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+    </div>
+<script>
+    $(document).ready(function(){
+        $('.event_year>li:first ').addClass('current')
+    });
+    $('label').click(function(){
+        $('.event_year>li').removeClass('current');
+        $(this).parent('li').addClass('current');
+        var year = $(this).attr('for');
+        $('#'+year).parent().prevAll('div').slideUp(800);
+        $('#'+year).parent().slideDown(800).nextAll('div').slideDown(800);
+    });
+</script>
+
+<div class="footer" style=" height: 50px"></div>
+{% endblock %}
+
+

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+ {% block title %}统计回顾{% endblock %}
+{% block content  %}
+<div  style="background: #f7f7f7; filter:progid:DXImageTransform.Microsoft.Shadow(color=#909090,direction=120,strength=4);
+   -moz-box-shadow: 2px 2px 10px #909090;
+   -webkit-box-shadow: 2px 2px 10px #909090;
+   box-shadow:2px 2px 10px #909090; margin-top: 50px; height: 45px; margin-bottom: 20px;">
+    <div class="container">
+        <div class="am-btn-group am-btn-group-justify">
+            <a class="am-btn am-btn-info" role="button" id="time_list">{{ name }}的工作历程</a>
+            <a class="am-btn am-btn-info" role="button" id="week_list">{{ name }}的周记录</a>
+            <a class="am-btn am-btn-info" role="button" id="table_list">{{ name }}的工作详情</a>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="col-sm-12 col-md-12">
+        <iframe name="type_show" width=100%  id="iframe_type" frameborder="0" src="{% url 'person_timeline' %}?id={{ id }}" scrolling="no" onload="this.height=500">
+
+        </iframe>
+    </div>
+</div>
+<script>
+    $(document).ready(function(){
+        var id = {{ id|safe }};
+        $("#week_list").click(function(){
+            $("#iframe_type").attr("src", "{% url 'week_list' %}?id="+ id)
+        })
+        $("#time_list").click(function(){
+            $("#iframe_type").attr("src", "{% url 'person_timeline' %}?id="+ id)
+        })
+         $("#table_list").click(function(){
+            $("#iframe_type").attr("src", "{% url 'table_list' %}?id="+ id)
+        })
+    })
+</script>
+<script type="text/javascript">
+    function reinitIframe(){
+        var iframe = document.getElementById("iframe_type");
+        try{
+            var bHeight = iframe.contentWindow.document.body.scrollHeight;
+            var dHeight = iframe.contentWindow.document.documentElement.scrollHeight;
+            var height = Math.max(bHeight, dHeight);
+            iframe.height = height;
+        }catch (ex){}
+    }
+    window.setInterval("reinitIframe()", 100);
+</script>
+{% endblock %}

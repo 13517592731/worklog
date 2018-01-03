@@ -14,7 +14,7 @@
        html,body{height:100%;margin:0;padding:0;}
       .wrap{min-height:100%;}
       .main{padding-bottom:130px;}/* main的padding-bottom值要等于或大于footer的height值 */
-      .footer{height:100px;margin-top:-100px;background: #9eacb4;;}/* margin-top（负值的）高度等于footer的height值 */
+      .footer{height:100px;margin-top:-100px;background: #9eacb4;}/* margin-top（负值的）高度等于footer的height值 */
     </style>
     {% block static %}
     {% endblock %}
@@ -39,18 +39,18 @@
 
                 <div class="collapse navbar-collapse">
                     <ul class="navbar-nav nav" style="font-size: 18px">
-                        <li><a href="#"><img src="{% static 'bootstrap/images/项目.png' %}">&nbsp项目 &nbsp&nbsp</a></li>
-                        <li><a href="{% url 'calendar' %}"><img src="{% static 'bootstrap/images/日历.png' %}">&nbsp日历</span>&nbsp&nbsp </a></li>
-                        <li><a href="{% url 'review_index' %}"><img src="{% static 'bootstrap/images/记事本.png' %}">&nbsp统计</span> &nbsp&nbsp</a></li>
+                        <li><a href="{% url 'projects' %}"><img src="{% static 'zui/images/项目.png' %}">&nbsp项目 &nbsp&nbsp</a></li>
+                        <li><a href="{% url 'calendar' %}"><img src="{% static 'zui/images/日历.png' %}">&nbsp日历</span>&nbsp&nbsp </a></li>
+                        <li><a href="{% url 'review_index' %}"><img src="{% static 'zui/images/记事本.png' %}">&nbsp统计</span> &nbsp&nbsp</a></li>
                         <li class="dropdown">
-                            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown"><img src="{% static 'bootstrap/images/用户.png' %}">&nbsp我的</span> &nbsp&nbsp</a>
+                            <a href="javascript:return false;" class="dropdown-toggle" data-toggle="dropdown"><img src="{% static 'zui/images/用户.png' %}">&nbsp我的</span> &nbsp&nbsp</a>
                             <ul class="dropdown-menu">
-                                <li><a href="javascript:;" data-toggle="modal" data-target="#profileModal">我的资料</a></li>
+                                <li><a href="" data-toggle="modal" data-target="#profileModal">我的资料</a></li>
                                 <li><a href="{% url 'ForgetPwd' %}">修改密码</a></li>
                                 <li><a href="{% url 'user_logout' %}">退出系统</a></li>
                             </ul>
                         </li>
-                        <li><a href="#"><img src="{% static 'bootstrap/images/信息.png' %}">&nbsp&nbsp通知</span> &nbsp</a></li>
+                        <li><a href="#"><img src="{% static 'zui/images/信息.png' %}">&nbsp&nbsp通知 &nbsp</a></li>
                     </ul>
                     <div class="collapse navbar-collapse navbar-collapse-example">
                         <!-- 导航中的表单 -->
@@ -69,8 +69,8 @@
     </div>
     <!--main-->
     <div class="main">
-        <div class="mian-top" style="height: 170.483px;">
-            <img src="{% static 'bootstrap/images/11.png' %}" style="width: 100%">
+        <div class="mian-top" style="height: 170.483px; margin-bottom: 50px;">
+            <img src="{% static 'zui/images/11.png' %}" style="width: 100%">
         </div>
         <!--中间内容部分-->
         {% block content %}

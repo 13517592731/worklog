@@ -9,19 +9,36 @@ from django.views.decorators.csrf import csrf_exempt
 from email.mime.text import MIMEText
 from .email_base import email
 from .models import Captch
-from django.core.paginator import PageNotAnInteger,Paginator,InvalidPage,EmptyPage
+from mycalendar.models import calendar
+from django.core.paginator import PageNotAnInteger,Paginator, EmptyPage
 from login.models import Profile
+from datetime import datetime
+from mycalendar.models import message
+from myproject.models import task, project
+import time
 def admin(req):
-    is_login = req.session.get('is_login', False)
+    is_login = req.session.get('admin_status', False)
     # 如果为真，就说明用户是正常登陆的
     if is_login:
-        return render(req, "admin/index.html", locals())
+        id_exit = req.session.get('admin_id', False)
+        if id_exit and User.objects.get(id=id_exit).is_superuser:
+            return redirect("admin_index")
+        else:
+            return render(req, 'admin/login.html', {"user_error": "抱歉，你没有权限执行此操作，请联系管理员"})
     else:
         """
         如果访问的时候没有携带正确的session，
         就直接被重定向url回login页面
         """
-        return render(req, "admin/login.html")
+        return redirect('login')
+
+def admin_index(req):
+    user_id = req.session.get("admin_id")
+    from mycalendar.models import message
+    cal_number = len(calendar.objects.all())
+    user_number = len(User.objects.all())
+    messege_number = len(message.objects.filter(target_id=user_id))
+    return render(req, "admin/index.html", locals())
 def login(req):
     return render(req, "admin/login.html")
 
@@ -29,28 +46,72 @@ def admin_login(req):
     if req.method == "POST":
         username = req.POST.get('user')
         password = req.POST.get('pwd')
-        user_is_exits = User.objects.filter(username=username)
-        if len(user_is_exits) == 0:
-            return render(req, 'admin/login.html', {"user_error": "该用户不存在"})
+        # 判断用户是否以用户名登陆
+        user = authenticate(username=username, password=password)
+        if user is None:
+            try:
+                user1 = User.objects.filter(email=username)
+                name = user1.values('username')[0]['username']
+                # 判断用户是否以邮箱登陆
+                user = authenticate(username=name, password=password)
+            except:
+                return render(req, 'admin/login.html', {"pwd_error": "用户名和密码不匹配"})
+        if user is not None:
+            is_super = user.is_superuser
+            if is_super == True:
+                # 是否记住密码
+                status = req.POST.get('status')
+                # 认证用户
+                req.session['admin_id'] = user.id
+                req.session['admin_status'] = True
+                if status == None:
+                    req.session['admin_status'] = False
+                # 登陆成功就跳转到管理员首页
+                return redirect('admin_index')
+            else:
+                return render(req, 'admin/login.html', {"user_error": "抱歉，你没有权限执行此操作，请联系管理员"})
         else:
-            # 是否记住密码
-            status = req.POST.get('status')
-            # 认证用户
-            if username != "" and password != "":
-                user = authenticate(username=username, password=password)
-                if user is not None:
-                    if status == None:
-                        req.session['is_login'] = False
-                        req.session['status'] = False
-                    req.session['is_login'] = True
-                    req.session['username'] = username
-                    req.session['status'] = True
-                    # 登陆成功就跳转到管理员首页
-                    return redirect('admin')
-                else:
-                    return render(req, 'admin/login.html', {"pwd_error": "密码错误"})
+            return render(req, 'admin/login.html', {"pwd_error": "用户名和密码不匹配"})
     #登陆不成功停留在登陆界面
     return render(req, 'admin/login.html')
+
+def get_trends(req):
+    create_date = datetime.now().strftime("%Y-%m-%d")
+    id = req.session.get("admin_id")
+    users = Profile.objects.exclude(user_id=id)
+    avator_list = []
+    name_list = []
+    user_list = []
+    for us in users:
+        name_list.append(us.name)
+        user_list.append(us.user_id)
+        avator_list.append(str(us.avator))
+    results = []
+    all_trends = 0
+    all = len(calendar.objects.filter(create_date=create_date, auth_id__in=user_list))
+    for l in range(len(user_list)):
+        temp = []
+        temp.append(name_list[l])
+        temp.append(avator_list[l])
+        cal = calendar.objects.filter(auth_id=user_list[l], create_date=create_date)
+        all_trends += len(cal)
+        temp.append(len(cal))
+        times = 0.0
+        for c in cal:
+            if c.auth_id == l:
+                times += float(c.order_time)
+        temp.append("%.2f"%times)
+        if all == 0:
+            type = 0
+        else:
+            type = "%.f"%((len(cal))/all)
+        temp.append(type)
+        results.append(temp)
+    return JsonResponse({"result": results, "all_trends": all_trends})
+
+
+
+
 
 def logout(req):
     """
@@ -60,7 +121,8 @@ def logout(req):
     """
     try:
         # 删除is_login对应的value值
-        del req.session['is_login']
+        del req.session['admin_id']
+        del req.session['admin_status']
     except KeyError:
         pass
     # 点击注销之后，直接重定向回登录页面
@@ -88,6 +150,7 @@ def user_admin(req):
 
 def ForgetPwd(req):
     return render(req, "admin/ForgetPwd.html")
+
 @csrf_exempt
 def send_captch(req):
     email = str(req.POST.get('email'))
@@ -99,6 +162,7 @@ def send_captch(req):
         return JsonResponse({"status": True})
     else:
         return JsonResponse({"status": False})
+
 def edit_pwd(req):
     email = str(req.POST.get('email'))
     pwd = str(req.POST.get('pwd'))
@@ -111,9 +175,14 @@ def edit_pwd(req):
         return render(req, "admin/editPwd.html", {"error": "发生未知异常,请稍后重试"})
 
 def get_user(req):
-    username = req.session['username']
+    from login.models import Profile
+    user_id = req.session.get("admin_id")
+    user = Profile.objects.get(user_id=user_id)
+    name = user.name
+    avator = user.avator
     context = {
-        "username": username
+        "name": name,
+        "avator": str(avator)
     }
     return JsonResponse(context)
 
@@ -181,7 +250,7 @@ def add_user(req):    #新添用户
         user.save()
         pp=Profile.objects.create(user_id=user.id,name=Fullname)
         pp.save()
-        return JsonResponse({'msg': "success"})
+        return JsonResponse({'msg':"success"})
     else:
         return JsonResponse({'msg': "exist"})
 
@@ -206,8 +275,6 @@ def save_user(req):
     else:
         return JsonResponse({'msg': "error"})
 
-def test(req):
-    return render(req,'admin/PersonalTimeline.html')
 @csrf_exempt
 def manager(req):
     list=[]
@@ -222,8 +289,6 @@ def manager(req):
         User.objects.filter(id__in=ids).update(is_superuser=1)
         return JsonResponse({'msg':'OK'})
 
-def test2(req):
-    return render(req,'admin/personal.html')
 @csrf_exempt
 def ordinary(req):
     list=[]
@@ -233,11 +298,231 @@ def ordinary(req):
         if(man.is_superuser==0):
             list.append(man.id)
     if(len(list)>0):
-        return JsonResponse({'msg':'already'})
+        return JsonResponse({'msg': 'already'})
     else:
         User.objects.filter(id__in=ids).update(is_superuser=0)
         return JsonResponse({'msg': 'OK'})
 
+def PersonalTimeline(req):
+    after_range_num = 2
+    bevor_range_num = 1
+    info = Profile.objects.all()
+    paginator = Paginator(info, 8)
+    try:
+        page = int(req.GET.get('page'))
+    except:
+        page = 1
+    try:
+        list_items = paginator.page(page)
+    except PageNotAnInteger:  # 如果页面不是整数，则传递第一页。
+        list_items = paginator.page(1)
+    except EmptyPage:  # 如果page超过范围//跳到最后一页
+        list_items = paginator.page(paginator.num_pages)
+    if page >= after_range_num:
+        page_range = paginator.page_range[page - after_range_num:page + bevor_range_num]
+    else:
+        page_range = paginator.page_range[0:int(page) + bevor_range_num]
+    return render(req,'admin/PersonalTimeline.html',locals())
+
+@csrf_exempt
+def search(req):
+    name = req.POST.get('name')
+    search = Profile.objects.filter(name=name)
+    if (len(search)) > 0:
+        return render(req , 'admin/PersonalTimeline.html', {'list_items': search})
+    else:
+        return render(req,'admin/PersonalTimeline.html',{'msg':'没有搜到该用户'})
+
+def select(req):
+    id=req.GET.get('id')
+    name = Profile.objects.get(user_id=id).name
+    return render(req,'admin/select.html', locals())
+
+def tableshows(req):
+    id=req.GET.get('id')
+    user_name = Profile.objects.get(user_id=id)
+    cals=calendar.objects.filter(auth_id=id)
+    now = datetime.now()
+    return render(req,'admin/tableshows.html', locals())
+
+@csrf_exempt
+def personal(req):
+    now_year = datetime.now().strftime("%Y")
+    now_week = datetime.now().strftime("%W")
+    month = [1 , 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    week = []
+    year = []
+    s = []
+    for i in range(7):
+        s.append(0)
+    id=req.GET.get('id')
+    user_name=Profile.objects.get(user_id=id)
+    cals=calendar.objects.filter(auth_id=id)
+    for c in cals:
+        year.append(c.create_year)
+        week.append(c.create_week)
+    years = list(set(year))
+    weeks = list(set(week))
+    years.sort()
+    weeks.sort()
+    nows=calendar.objects.filter(auth_id=id,create_year=now_year,create_week=now_week)
+    for now in nows:
+        try:
+            endarray=time.strptime(str(now.end_time),"%Y-%m-%d %H:%M:%S")
+            startarray=time.strptime(str(now.start_time),"%Y-%m-%d %H:%M:%S")
+            end=time.mktime(endarray)
+            start=time.mktime(startarray)
+            s[int(now.create_weekday)] = (int(end) - int(start)) / (60 * 60)
+        except:
+            end=0
+            start=0
+            s[int(now.create_weekday)] = (int(end) - int(start)) / (60 * 60)
+    return render(req,'admin/personal.html', locals())
+
+def personal_change(req):
+    m=[]
+    for i in range(7):
+        m.append(0)
+    id = req.GET.get('id')
+    select_year=req.GET.get('select_year')
+    select_week = req.GET.get('select_week')
+    selects = calendar.objects.filter(auth_id=id, create_year=select_year, create_week=select_week)
+    for select in selects:
+        try:
+            endarray=time.strptime(str(select.end_time),"%Y-%m-%d %H:%M:%S")
+            startarray=time.strptime(str(select.start_time),"%Y-%m-%d %H:%M:%S")
+            end=time.mktime(endarray)
+            start=time.mktime(startarray)
+            m[int(select.create_weekday)] = (int(end) - int(start)) / (60 * 60)
+        except:
+            end=0
+            start=0
+            m[int(select.create_weekday)] = (int(end) - int(start)) / (60 * 60)
+    return JsonResponse({'msg': 'ok', 'm':m})
+
+def timeline(req):
+    year = []
+    id=req.GET.get('id')
+    user_name = Profile.objects.get(user_id=id)
+    cals = calendar.objects.filter(auth_id=id)
+    for c in cals:
+        year.append(c.create_year)
+    years = list(set(year))
+    years.sort()
+    return render(req,'admin/timeline.html', locals())
+
+def get_message(req):
+    type = req.GET.get("type")
+    user_id = req.session.get("admin_id")
+    messages = message.objects.filter(target_id=user_id, status=False)
+    now = datetime.now()
+    result = []
+    for m in messages:
+        temp = []
+        temp.append(m.description)
+        start = now - m.create_time
+        day = start.days
+        hour = round(start.seconds/3600)
+        minute = round(start.seconds/60)
+        if day >= 1:
+            content = str(day) + "天前"
+        elif hour >= 1:
+            content = str(hour) + "小时前"
+        else:
+            content = str(minute) + "分钟前"
+        temp.append(content)
+        result.append(temp)
+    if type == "less":
+        result = result[:3]
+    contxet = {
+        "times": len(messages),
+        "messages": result
+    }
+    return JsonResponse(contxet)
+
+def get_message_read(req):
+    user_id = req.session.get("admin_id")
+    messages = message.objects.filter(target_id=user_id, status=True)
+    now = datetime.now()
+    result = []
+    for m in messages:
+        temp = []
+        temp.append(m.description)
+        start = now - m.create_time
+        day = start.days
+        hour = round(start.seconds/3600)
+        minute = round(start.seconds/60)
+        if day >= 1:
+            content = str(day) + "天前"
+        elif hour >= 1:
+            content = str(hour) + "小时前"
+        else:
+            content = str(minute) + "分钟前"
+        temp.append(content)
+        result.append(temp)
+    contxet = {
+        "messages": result
+    }
+    return JsonResponse(contxet)
+
+def project_process(req):
+    type = req.GET.get("type")
+    result = type_project(type)
+    contxet = {
+        "tasks": result
+    }
+    return JsonResponse(contxet)
+def type_project(type):
+    result = []
+    #未完成的项目
+    temp = []
+    if type == "img":
+        projects = project.objects.filter(pro_status=False)
+        for p in projects:
+            temp.append([p.pro_id, p.pro_name])
+        for t in temp:
+            all_tasks = task.objects.filter(pro_id=t[0])
+            tasked = task.objects.filter(pro_id=t[0], status=True)
+            process = (len(tasked) / len(all_tasks))*100
+            result.append([t[1], process, t[0]])
+        return result
+    # 已完成或延期完成的项目
+    else:
+        from datetime import datetime
+        now = datetime.today()
+        projects = project.objects.filter(pro_status=True)
+        for p in projects:
+            day = (now - p.pro_end)
+            status = str(day) + "天前"
+            if day.day < 1:
+                hour = day.hour
+                status = str(hour) + "小时前"
+            result.append([p.pro_name, status, p.pro_id])
+        return result
 
 
+def admin_messages(req):
+    return render(req, "admin/admin_messages.html")
+def admin_create_project(req):
+    return render(req, "admin/create_project.html")
 
+def admin_project(req):
+    return render(req, "admin/admin_projects.html")
+
+def admin_project_detail(request):
+    from myproject.models import project, project_member
+    pro_id = request.GET.get('pro_id')
+    project_info = project.objects.get(pro_id=pro_id)
+    pro_auth = project_info.pro_auth_id
+    name = project_info.pro_name
+    member = project_member.objects.filter(pro_id=pro_id)
+    members_id = []
+    members_id.append(pro_auth)
+    for i in member:
+        members_id.append(i.pro_member_id)
+    members = Profile.objects.filter(user_id__in=members_id)
+    return render(request, "admin/project_detail.html", {
+        'name': name,
+        'members': members,
+        'pro_id': pro_id,
+    })

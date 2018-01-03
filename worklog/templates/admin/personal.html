@@ -1,131 +1,128 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 {% load staticfiles %}
-<html><head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<title>personal</title>
-<meta name="description" content="">
-<meta name="keywords" content="">
-<link href="" rel="stylesheet">
-<link rel="stylesheet" type="text/css" href="{% static 'amaze/css/fullcalendar.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'zui/css/zui.min.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-<script type="text/javascript" src="{% static 'amaze/js/jquery.js' %}"></script>
-<script type="text/javascript" src="{% static 'zui/js/zui.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'amaze/js/fullcalendar.min.js' %}"></script>
-</head>
+{% block title %}personal{% endblock %}
+{% block nav %}<li class="am-active">统计分析</li><li class="am-active">personal</li>{% endblock %}
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="{% static 'amaze/css/layout.css' %}">
+    <script type="text/javascript" src="{% static 'amaze/js/html5shiv.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'amaze/js/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'amaze/js/jquery-ui.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'amaze/js/respond.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'amaze/js/echarts.min.js' %}"></script>
+    <!--main-->
+<div class="tpl-portlet-components" style="height: 600px">
+    <div class="portlet-title">
+         <div class="caption font-back bold" style="height: 100px;">
 
-<body>
+             <form class="am-form-inline" role="form">
+                 <div class="am-form-group">
+                     我的工作时间：
+                 </div>
+                 <div class="am-form-group">
+                     <label>年</label>
+                     <select id="select-year" onchange="$.change()">
+                         {% for year in years %}
+                            <option>{{ year }}</option>
+                        {% endfor %}
+                     </select>
+                 </div>
+                 <div class="am-form-group">
+                     <label>周</label>
+                     <select id="select-week" onchange="$.change()">
+                            {% for i in weeks %}
+                        <option>{{ i }}</option>
+                        {% endfor %}
+                     </select>
+                 </div>
+             </form>
 
-<!--head-->
-<div class="header">
-<nav class="nav navbar-fixed-top" role="navgation" style="background: #FFFFFF;">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a href="#" class="navbar-brand">
-              worklog
-            </a>
-
-            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-        </div>
-
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav nav" style="font-size: 18px">
-                <li><a href="#"><img src="{% static 'bootstrap/images/主页.png' %}">&nbsp主页 &nbsp</a></li>
-                <li><a href="#"><img src="{% static 'bootstrap/images/项目.png' %}">&nbsp项目 &nbsp</a></li>
-                <li><a href="#"><img src="{% static 'bootstrap/images/日历.png' %}">&nbsp日历 &nbsp </a></li>
-                <li><a href="#"><img src="{% static 'bootstrap/images/记事本.png' %}">&nbsp统计 &nbsp</a></li>
-                <li><a href="#"><img src="{% static 'bootstrap/images/用户.png' %}">&nbsp我的 &nbsp</a></li>
-                <li><a href="#"><img src="{% static 'bootstrap/images/信息.png' %}">&nbsp 通知</a></li>
-            </ul>
-            <div class="navbar-form navbar-right" style="margin-right: 30px;">
-                <input type="text" class="form-control" name="" placeholder="请输入搜索内容">
-                <button class="btn btn-success" style="margin-right: 30px; background-color: #005fb3"><span class="glyphicon glyphicon-search"></span></button>
+         </div>
+    </div>
+    <!--图表面板-->
+    <div class="panel" style=" height: 500px">
+        <div class="tpl-block">
+            <div class="am-g">
+                <div class="am-u-sm-12 am-u-md-12">
+                    <div class="am-btn-toolbar">
+                        <div class="panel-body" style="height:500px;">
+                            <div class="panel-body-body" id="main" style="height: 569px; padding-right: 80px;padding-bottom: 80px"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</nav>
 </div>
+<script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: '{{ user_name.name }}的{{ now_year }}年第{{ now_week }}周的工作时间'
+            },
+            tooltip: {},
+            legend: {
+                data:['工作时间']
+            },
+            xAxis: {
+                data: ["Mon","Tue","Wed","Thu","Fri","Sta","Sun"]
+            },
+            yAxis: {
+            },
+            series: [{
+                name: '工作时间',
+                type: 'bar',
+                data: {{ s }}
+            }]
+        };
 
-<!--
-注意:这里由于设置了顶部固定导航栏：navbar-fixed-top
-所以，当设置内容页时，顶部导航栏可能会盖住内容。这时需要给内容部分设置一个顶部外边距也可以解决
-<div style="height: 1500px;width: 500px;background-color: red; margin-top: 70px;"></div>
- -->
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+</script>
+<script>
+    $.change=function () {
+        var select_year=$('#select-year option:selected').text();
+        var select_week=$('#select-week option:selected').text();
+        var id={{ user_name.user_id }}
+        $.ajax({
+            url:'{% url 'personal_change' %}',
+            cache:false,
+            type:'GET',
+            data:{
+                'select_year':select_year,
+                'select_week':select_week,
+                'id':id
+            },
+            success:function (ret) {
+                if(ret.msg=='ok'){
+                    var myChart = echarts.init(document.getElementById('main'));
 
-<!--main-->
-<div class="mian" style=" padding: 100px; background-color:#e9e9e9;">
-    <!--图表面板-->
-    <div class="panel" style="text-align: center; ">
-          <div class="panel-heading" style="background-color: #ffffff; height: 100px; padding: 30px">
-                <!--下拉菜单-->
-              <form class="form-inline">
-                  <div class="form-group">
-                    <select class="form-control" id="select-year">
-                        <option>2016</option>
-                        <option>2017</option>
-                        <option>2018</option>
-                    </select>
-                    <label for="select-year">年</label>
-                  </div>
+        // 指定图表的配置项和数据
+                    var option = {
+                        title: {
+                            text: '{{ user_name.name }}的'+select_year+'年第'+ select_week+'周的工作时间'
+                        },
+                        tooltip: {},
+                        legend: {
+                            data:['工作时间']
+                        },
+                        xAxis: {
+                            data: ["Mon","Tue","Wed","Thu","Fri","Sta","Sun"]
+                        },
+                        yAxis: {},
+                        series: [{
+                            name: '工作时间',
+                            type: 'bar',
+                            data:ret.m
+                        }]
+                    };
+                    // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+                }
+            }
+        })
+    }
+</script>
+{% endblock %}
 
-                  <div class="form-group">
-                     <select class="form-control" id="select-month">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                         <option>4</option>
-                        <option>5</option>
-                        <option>6</option>
-                         <option>7</option>
-                        <option>8</option>
-                        <option>9</option>
-                         <option>10</option>
-                        <option>11</option>
-                        <option>12</option>
-                    </select>
-                    <label for="select-month">月</label>
-                  </div>
-
-                  <div class="form-group">
-                    <select class="form-control" id="select-week">
-                        <option>一</option>
-                        <option>二</option>
-                        <option>三</option>
-                        <option>四</option>
-                        <option>五</option>
-                        <option>六</option>
-                        <option>七</option>
-                        <option>八</option>
-                        <option>九</option>
-                        <option>十</option>
-                        <option>十一</option>
-                        <option>十二</option>
-                        <option>十三</option>
-                    </select>
-                    <label for="year" class="week">周</label>
-                  </div>
-              </form>
-          </div>
-          <div class="panel-body">
-            <img src="{% static 'zui/images/图表2.jpg' %}" width="1150px" height="569px">
-          </div>
-    </div>
-</div>
-
-
-
-<!--footer-->
-<div class="footer" style="background: #9eacb4; height: 100px; bottom: 0; padding: 20px">
-    <p style="text-align: center; font-family: 'Adobe Caslon Pro Bold'">&copy 广西财经学院  数据挖掘实验室</p>
-    <p style="text-align: center; font-family: 'Adobe Caslon Pro Bold'">
-            邮箱：415540557 &nbsp  电话：18078134492<br/>
-        	地址：广西财经学院明秀校区 &nbsp 2号实验楼205数据挖掘实验室<br /></p>
-</div>
-</body>
-</html>

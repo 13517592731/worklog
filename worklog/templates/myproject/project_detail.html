@@ -1,0 +1,263 @@
+{% extends 'user_base.html' %}
+{% load staticfiles %}
+{% block title %}项目详情{% endblock %}
+{% block static %}
+    <link rel="stylesheet" href="{% static 'zui/css/project_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'zui/css/group.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="container">
+    <div class="page page-root simple-pjax">
+        <div class="page-inner">
+            <div class="project-header">
+                <div class="project-hd-info">
+                    <span class="project-name">{{ name|safe }}</span>
+                    <span class="project-desc"></span>
+                </div>
+                <div class="project-links">
+                    <a class="project-status" id="task">
+                        <span id="mytasks"></span>
+                        <span>待处理任务</span>
+                    </a>
+                    <a class="project-members" id="member">
+                        <span id="mymembers"></span>
+                        <span>成员</span>
+                    </a>
+                </div>
+            </div>
+            <div class="project-sections">
+                <div class="section section-todos" id="todolists">
+                    <h3>
+                        <a class="title">任务</a>
+                        <div class="btn-group">
+                            <a class="btn collapse " data-target="#collapse" data-toggle="collapse" id="add">添加任务</a>
+                        </div>
+                    </h3>
+                    <div class="todos-all todos-view list-view">
+                        <div class="todolists-wrap">
+                            <div class="todolist default-todolist collapse " id="collapse">
+                                <ul class="todos todos-uncompleted ui-sortable"></ul>
+                                <ul class="todo-new-wrap">
+                                    <li class="todo-form new">
+                                        <form class="form form-edit-todo">
+                                            <div class="form-body">
+                                                <textarea class="todo-content no-border" name="tash" placeholder="新任务" id="new_tash"></textarea>
+                                            </div>
+                                            <div class="invite-member">
+                                                分配给:
+                                                {% for i in members %}
+                                                    <input type="checkbox" name="member" value="{{ i.user_id|safe}}">{{ i.name|safe}}
+                                                {% endfor %}
+                                            </div>
+                                            <div class="order-time">
+                                                <label>任务期限：</label>
+                                                <input type="text" style="margin-top: 10px; width: 60px;" id="order-time">
+                                                <label>天</label>
+                                            </div>
+                                            <div class="buttons create-buttons">
+                                                <button class="btn btn-primary btn-create-todo" type="button" id="add_tash">添加任务</button>
+                                            </div>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <script src="{% static 'zui/js/messager.js' %}"></script>
+                    <script type="text/javascript">
+                        var myMessager = new $.zui.Messager({type: 'danger'});
+                        $(document).ready(function(){
+                            $("#add_tash").click(function(){
+                                var tash = $("#new_tash").val();
+                                var pro_id = {{ pro_id }};
+                                var order_time = $("#order-time").val();
+                                var times = $('input[name="member"]:checked');
+                                var members = new Array();
+                                $.each(times, function(){
+                                    members.push($(this).val());
+                                });
+                                if(tash==""){
+                                    myMessager.show("你是不是忘记填写任务了");
+                                    $("#new_tash").focus();
+                                } else if(members==""){
+                                    myMessager.show("请选择成员");
+                                } else if(order_time == "" || isNaN(order_time)==true){
+                                    myMessager.show("时间必须是数字");
+                                }
+                                else{
+                                    $.ajax({
+                                        url:"{% url 'ajax_calendar' %}",
+                                        data:{'title': tash, 'auth': members, 'order_time': order_time, 'pro_id': pro_id},
+                                        type:'POST',
+                                        success:function(data){
+                                            if(data.status == 1){
+                                                $("#new_tash").val("");
+                                                $("#order-time").val("");
+                                                var tasks = $("#mytasks").html();
+                                                $("#mytasks").html(parseInt(tasks) + 1);
+                                                myMessager.show("分配成功");
+                                            }else if(data.status == 0){
+	                                             myMessager.show('这个任务已经分配过了');
+                                            }else{
+                                                myMessager.show(data.error);
+                                            }
+                                        }
+                                    })
+                                }
+                            })
+                        })
+                        $("#task").click(function(){
+                            var pro_id = {{ pro_id }};
+                            window.location.href = "{% url 'tasks' %}?pro_id=" + pro_id;
+                        })
+                        $("#member").click(function(){
+                            var pro_id = {{ pro_id }};
+                            window.location.href = "{% url 'mymembers' %}?pro_id=" + pro_id;
+                        })
+                    </script>
+                    <div class="todos-all todos-view list-view">
+                        <h3>
+                            <a class="title">文件</a>
+                            <div class="btn-group">
+                                <a class="btn btn-mini btn-new-todo btn-default-todolist" href="javascript:;">文件上传</a>
+                            </div>
+                        </h3>
+                    </div>
+                    <div class="section section-files" id="uploads">
+                        <div class="gallery  col-xs-12 col-md-12 col-sm-12 col-lg-12">
+                            <div class="dir-name col-md-3 col-xs-4 col-lg-3 col-ms-4">
+                                <div class="icon-dir">
+                                    <a href="{% url 'upfile' %}?id={{ pro_id }}"><img src="{% static 'zui/images/file.jpg' %}"></a>
+                                </div>
+                                <div class="word-dir">
+                                    <a href="{% url 'upfile' %}?id={{ pro_id }}">参考资料</a>
+                                </div>
+                            </div>
+                            <div class="dir-name col-md-3 col-xs-4 col-lg-3 col-ms-4">
+                                <div class="icon-dir">
+                                    <a href="{% url 'upfile' %}?id={{ pro_id }}"><img src="{% static 'zui/images/file.jpg' %}"></a>
+                                </div>
+                                <div class="word-dir ">
+                                    <a href="{% url 'upfile' %}?id={{ pro_id }}">设计图</a>
+                                </div>
+                            </div>
+                            <div class="dir-name col-md-3 col-xs-4 col-lg-3 col-ms-4">
+                                <div class="icon-dir">
+                                    <a href="{% url 'upfile' %}?id={{ pro_id }}"><img src="{% static 'zui/images/file.jpg' %}"></a>
+                                </div>
+                                <div class="word-dir">
+                                    <a href="{% url 'upfile' %}?id={{ pro_id }}">需求文档</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section section-messages">
+                        <h3>
+                            <a class="title">讨论</a>
+                            <div class="btn-group">
+                                <a class="btn">发起讨论</a>
+                            </div>
+                        </h3>
+                        <div class="form-edit">
+                            <script src="{% static 'zui/lib/kindeditor/kindeditor.min.js' %}"></script>
+                            <script charset="utf-8" src="{% static 'zui/lib/kindeditor/lang/zh_CN.js' %}"></script>
+                            <script type="text/javascript">
+                                $.comment = function(data){
+                                    $(".message").html("");
+                                    for (var i = 0; i < data.length; i++) {
+                                        var members_div = $("<div>");
+                                        members_div.addClass("div-comment");
+                                        members_div.appendTo($(".message"));
+                                        var detail = $("<div class='detail'></div>");
+                                        var word = $("<div class='word'></div>");
+                                        var m_src = data[i].avator;
+                                        var send_time = $("<div class='right-padding-info'></div>");
+                                        send_time.html(data[i].send_time);
+                                        var avator = $("<img class = 'avator'>");
+                                        var name_span = $("<span class='nickname'></span>");
+                                        var avator_span = $("<span></span>");
+                                        var m_div = $("<div></div>");
+                                        m_div.addClass("member-title");
+                                        avator.attr('src',m_src);
+                                        avator_span.append(avator);
+                                        name_span.html(data[i].name);
+                                        name_span.appendTo(m_div);
+                                        avator_span.appendTo(m_div);
+                                        m_div.appendTo(detail);
+                                        word.html(data[i].word);
+                                        detail.appendTo(members_div);
+                                        word.appendTo(members_div);
+                                        send_time.appendTo(members_div);
+                                        $(".message").append("</div>");
+                                        editor.html("");
+                                    }
+                                }
+                                var myMessager = new $.zui.Messager({type: 'success'});
+                                var editor;
+                                KindEditor.ready(function(K) {
+                                    editor = K.create('#edit_id', {
+                                        filterMode: true,
+                                        allowFileManager: true,
+                                    });
+                                    K('button[name=send]').click(function(e) {
+                                        var pro_id = {{ pro_id }};
+                                        var title = editor.html();
+                                        if(title == "")
+                                            myMessager.show("评论不能为空")
+                                        else{
+                                            $.ajax({
+                                                url:'{% url 'ajax_send' %}',
+                                                type:'POST',
+                                                data:{'word': title, 'pro_id': pro_id},
+                                                success:function(data){
+                                                    if(data.status == 1)
+                                                        $.comment(data.info);
+                                                    else
+                                                        myMessager.show(data.error)
+                                                }
+                                            })
+                                        }
+                                    })
+                                    K(window).load(function() {
+                                        var pro_id = {{ pro_id }};
+                                        $.ajax({
+                                            url:'{% url 'ajax_getcomment' %}',
+                                            type:'POST',
+                                            data:{'pro_id': pro_id},
+                                            success:function(data){
+                                                $.comment(data.info);
+                                            }
+                                        })
+                                    })
+                                });
+                            </script>
+                            <div class="form-item">
+                                <textarea id="edit_id" name="content" class="form-control kindeditor" style="width:100%; min-height:150px;"></textarea>
+                            </div>
+                            <div class="form-button">
+                                <button class="btn btn-primary btn-success" type="button" name="send">发表评论</button>
+                            </div>
+                        </div>
+                        <div class="message">
+
+                        </div>
+                    </div>
+
+                    <div class="project-footer">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script>
+        var pro_id = {{ pro_id|safe }};
+        $.getJSON("{% url 'get_project_number' %}", {"pro_id": pro_id}, function(data){
+            numbers = data.numbers
+            tasks = data.tasks;
+            $("#mymembers").html(numbers);
+            $("#mytasks").html(tasks);
+        });
+    </script>
+{% endblock %}

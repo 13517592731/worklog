@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}tableshows{% endblock %}
+{% block nav %}<li class="active"></li>{% endblock %}
+{% block content %}
+<script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <div class="tableshow">
+        <table class="table table-striped">
+          <p style=" text-align: center;color: #3c3c3c ; font-size: 20px ">{{ user_name.name }}的工作表格</p>
+          <thead style="background-color: #cccccc; " >
+            <tr >
+                <th style="text-align: center">Calendar_id</th>
+                <th style="text-align: center">工作内容</th>
+                <th style="text-align: center">开始时间</th>
+                <th style="text-align: center">结束时间</th>
+                <th style="text-align: center">总耗时（小时）</th>
+                <th style="text-align: center">进度</th>
+                <th style="text-align: center">状态</th>
+            </tr>
+          </thead>
+          <tbody style="text-align: center">
+            {% for cal in cals %}
+                <tr id="{{ cal.calendar_id }}" style="background-color: #c2cad8">
+                    <td>{{ cal.calendar_id }} </td>
+                    <td>{{ cal.content }}</td>
+                    <td>{{ cal.start_time }}</td>
+                    <td>{{ cal.end_time }}</td>
+                    <td></td>
+                    <td></td>
+                    {% if cal.end_time < now %}
+                        <td>已完成</td>
+                    {% else %}
+                        <td>未完成</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+          </tbody>
+    </table>
+    </div>
+<script>
+{% for cal in cals %}
+    $('#'+{{ cal.calendar_id }}).bind("myevent",function (event,msg,msg2) {
+        $(this).find('td').eq(4).text(msg)
+        $(this).find('td').eq(5).text(msg2)
+    })
+    var msg2
+    var now = new Date('{{ now|safe }}')
+    var start=new Date('{{ cal.start_time|safe }}')
+    var end=new Date('{{ cal.end_time|safe }}')
+    if((now.getTime()-end.getTime())/(1000 * 60 * 60 )>0){
+        msg2=100+'%'
+    }
+    else if((end.getTime()-now.getTime())/(1000 * 60 * 60 )>0){
+        msg2=(((now.getTime()-start.getTime())/(1000 * 60 * 60 ))/((end.getTime()-start.getTime())/(1000 * 60 * 60 ))*100).toFixed(3)+'%'
+    }
+    else{
+        msg2='NaN'
+    }
+    var hour=Math.round(Math.abs(start.getTime()-end.getTime())/(1000 * 60 * 60 ))
+    $('#'+{{ cal.calendar_id }}).trigger("myevent",[hour,msg2])
+{% endfor %}
+</script>
+{% endblock %}

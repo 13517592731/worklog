@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}统计分析{% endblock %}
+{% block nav %}<li class="am-active">统计分析</li>{% endblock %}
+{% block content %}
+
+    <!--main-->
+
+    <!--时间表搜索框-->
+<div class="tpl-portlet-components">
+    <div class="portlet-title">
+        <div class="input_content" style="padding-left: 80px; padding-top: 30px;padding-bottom: 10px">
+            <form class="form-inline" method="post" action="{% url 'search' %}">
+                <div class="form-group">
+                    <label style="float: left">个人时间表：</label>
+                    <span style="float: left"><input type="text" class="am-form-field" style="width: 300px"></span>
+                    <button type="submit">搜索</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--时间表-->
+    <div class="timeline" style="height: 600px; padding-left: 80px;padding-right: 80px">
+        {% if msg %}
+            {{ msg }}
+        {% endif %}
+        {% for list in list_items %}
+            <div  class="col-md-6 col-sm-3 col-lg-3" style="padding-left: 95px; padding-top: 60px">
+                <a class="card" style="width: 250px; height: 180px; ">
+                    <img onclick="$.send({{ list.user_id }})" src="{% static 'zui/images/时间表.png' %}">
+                    <div onclick="$.send({{ list.user_id }})" class="card-heading">
+                        <p style="text-align: center">{{ list.name }}</p>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!--分页-->
+    <div class="page" style="height: 78px;text-align: center">
+    <ul class="pager">
+        {% if list_items.has_previous %}
+          <li class="previous"><a href="?page={{ list_items.pervious_page_number }}">«</a></li>
+        {% endif %}
+        {% for i in page_range %}
+            {% ifequal i page %}
+                <li class="active"><a href="?page={{ i }}">{{ i }}</a></li>
+                {% else %}
+                <li><a href="?page={{ i }}">{{ i }}</a></li>
+            {% endifequal %}
+        {% endfor %}
+      {% if list_items.has_next %}
+          <li class="next"><a href="?page={{ list_items.next_page_number }}">»</a></li>
+      {% endif %}
+    </ul>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $.send=function (obj) {
+            $.ajax({
+                url:"{% url 'personal' %}",
+                type:'GET',
+                cache:false,
+                data:{
+                    "id":obj
+                },
+                success:function (ret) {
+                    window.location.href="{% url 'timeline' %}?id="+ obj;
+                }
+            })
+        }
+    })
+</script>
+{% endblock %}

@@ -29,3 +29,11 @@ urlpatterns = [
 ]
 handler404 = "login.views.page_not_found"
 handler500 = "login.views.page_error"
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from login.views import task_notice
+sched = BackgroundScheduler()
+def send_email():
+    task_notice()
+sched.add_job(send_email, "interval", seconds=3600)
+sched.start()

@@ -27,6 +27,7 @@ class message(models.Model):
     status = models.BooleanField()
     type = models.CharField(max_length=10)
     group_id = models.IntegerField(null=True, blank=True)
+    create_time = models.DateTimeField()
     class Meta:
         db_table = 'message'
 

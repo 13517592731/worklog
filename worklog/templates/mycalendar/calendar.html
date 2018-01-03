@@ -14,13 +14,12 @@
             background-color: #f4f7ed;
         }
         #calendar {
-            max-width: 85%;
+            max-width: 90%;
+            padding: 10px;
             margin: 60px auto 0 auto;
-            background-color: #FFFFFF;
-            filter:progid:DXImageTransform.Microsoft.Shadow(color=#909090,direction=120,strength=4);
-            -moz-box-shadow: 2px 2px 10px #909090;
-            -webkit-box-shadow: 2px 2px 10px #909090;
-            box-shadow:2px 2px 10px #909090; margin-top: 50px;
+             border: 1px solid #dbdfd6;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            background: #ffffff;
         }
         .view_a{
             color:#4ea5ad;
@@ -136,7 +135,7 @@
                         <label class="col-sm-2">日程类型</label>
                         <div class="col-md-8 col-sm-8">
                             <select class="form-control" id="calendar_type">
-                                <option>学习</option>
+                                <option selected>学习</option>
                                 <option>工作</option>
                                 <option>其他</option>
                             </select>
@@ -226,7 +225,6 @@
                             $('#calendar').fullCalendar('refetchEvents');
                             $("#close-modal").click();
                             $("#calendar_content").val("");
-                            $("#calendar_type").val("");
                             $("#start_time").val("");
                             $("#end_time").val("");
                         }

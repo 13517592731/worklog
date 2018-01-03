@@ -11,33 +11,37 @@ class project(models.Model):
     pro_type = models.CharField(max_length=10, verbose_name='项目类型')
     pro_status = models.BooleanField(verbose_name='项目状态')
     pro_auth_id = models.CharField(verbose_name='项目管理员', max_length=3)
-    pro_task = models.ForeignKey('task', on_delete=models.CASCADE)
-    pro_file = models.ForeignKey('file', on_delete=models.CASCADE)
-    pro_comment= models.ForeignKey('Comment', on_delete=models.CASCADE)
-    pro_member = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'project'
         permissions = (
             ("assign_task", "分配任务"),
             ("up_file", "上传文件"),
             ("down_file", "下载文件"),
         )
+        db_table = 'project'
+
+class project_member(models.Model):
+    pro_id = models.CharField(max_length=5)
+    pro_member_id = models.IntegerField()
+    class Meta:
+        db_table = 'project_member'
+
 
 
 class task(models.Model):
-    task_id = models.AutoField(primary_key=True)
+    pro_id = models.CharField(max_length=5, default="")
     auth_id = models.IntegerField(null=False, blank=False)
     title = models.CharField(max_length=50)
     content = models.CharField(max_length=100)
     status = models.BooleanField()
-    order_time = models.DateTimeField(verbose_name='预期时间')
-    date = models.CharField(max_length=20)
+    create_date = models.DateField()
+    order_time = models.DateField(verbose_name='预期时间')
+    true_date = models.DateField(verbose_name='实际完成时间')
     class Meta:
         db_table = 'project_task'
 
 class file(models.Model):
-    file_id = models.AutoField(primary_key=True)
+    pro_id = models.CharField(max_length=5, default="")
     file_name = models.CharField(max_length=50)
     file_url = models.CharField(max_length=255)
     date = models.CharField(max_length=20)
@@ -45,10 +49,10 @@ class file(models.Model):
         db_table = 'project_file'
 
 class Comment(models.Model):
-    comment_id = models.AutoField(primary_key=True)
+    pro_id = models.CharField(max_length=5, default="")
     auth_name = models.CharField(max_length=10)
     auth_id = models.IntegerField()
-    word = models.CharField(max_length=100)
+    word = models.CharField(max_length=500)
     avator = models.ImageField(upload_to="icons")
     send_time = models.DateField()
     class Meta:

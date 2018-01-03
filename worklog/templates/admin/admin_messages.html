@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}我的消息{% endblock %}
+{% block content %}
+    <div class="row">
+        <div id="wrapper">
+            <div id="scroller" class="scroller"></div>
+        </div>
+        <div class="am-u-md-11 am-u-sm-12 row-mb">
+            <div class="tpl-portlet">
+                <div class="tpl-portlet-title">
+                    <div class="tpl-caption font-green ">
+                        <span>我的消息</span>
+                    </div>
+
+                </div>
+
+                <div class="am-tabs tpl-index-tabs" data-am-tabs>
+                    <ul class="am-tabs-nav am-nav am-nav-tabs">
+                        <li class="am-active"><a href="#tab1">未读消息</a></li>
+                        <li><a href="#tab2">已读消息</a></li>
+                    </ul>
+
+                    <div class="am-tabs-bd">
+                        <div class="am-tab-panel am-fade am-in am-active" id="tab1">
+                            <div id="wrapperA" class="wrapper">
+                                <div id="scroller" class="scroller">
+                                    <ul class="tpl-task-list tpl-task-remind unreadable">
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="am-tab-panel am-fade" id="tab2">
+                            <div id="wrapperB" class="wrapper">
+                                <div id="scroller" class="scroller">
+                                    <ul class="tpl-task-list tpl-task-remind readable">
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            $.app = function(url, type, obj){
+                icon = ["am-icon-bullhorn", "am-icon-bolt", "am-icon-bell-o", "am-icon-plus"];
+                colors = ["cosIco label-danger", "cosIco label-info", "cosIco label-warning", "cosIco"]
+                $.getJSON(url, {"type": type}, function(data){
+                    obj.html("");
+                    $.each(data.messages, function(i, item){
+                        var x = 3;
+                        var y = 0;
+                        var rand = parseInt(Math.random() * (x - y + 1) + y);
+                        var li = $("<li></li>");
+                        var cosB= $("<div class=\"cosB\"></div>");
+                        var cosA= $("<div class=\"cosA\"></div>");
+                        var span = $("<span><span>");
+                        span.attr("class", colors[rand]);
+                        var i = $("<i></i>");
+                        i.attr("class", icon[rand]);
+                        span.append(i);
+                        var content = $("<span></span>");
+                        cosB.html(item[1]);
+                        content.html(item[0]);
+                        cosA.append(span);
+                        cosA.append("&nbsp;")
+                        cosA.append(content);
+                        li.append(cosB);
+                        li.append(cosA);
+                        obj.append(li);
+                    })
+                })
+            };
+            $.app("{% url 'get_message' %}", "more", $(".unreadable"));
+            $.app("{% url 'get_message_read' %}", "read", $(".readable"));
+        });
+    </script>
+{% endblock %}

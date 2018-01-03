@@ -1,0 +1,101 @@
+{% extends 'user_base.html'%}
+{% load staticfiles %}
+{% block title%}项目任务{% endblock %}
+{% block static %}
+
+{% endblock %}
+{% block content %}
+    <div id="task" style="width:1200px; margin: 50px auto; background: #FFFFFF;min-height:500px; border:1px solid #CCCCCC">
+        <p style="font-size: 20px; margin-left:40px;margin-top: 20px; ">任务统计</p>
+        <div class="count" style="margin: 30px auto; width:80%">
+            <!-- 使用 .boards 类来管理多个 .board -->
+            <div class="boards" id="myBoards">
+                <!-- .board 为单个容器 -->
+                <div class="board panel panel-info">
+                    <div class="panel-heading">
+                        <strong>未完成</strong>
+                    </div>
+                    <div class="panel-body ">
+                        <div class="board-list">
+                            {% for i in fail %}
+                                <div class="board-item">
+                                <a style="text-decoration: none" data-toggle="modal" data-target="#loginModal">
+                                    {{ i.content }} ({{ i.date }})
+                                </a>
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+                <div class="board panel panel-warning">
+                    <div class="panel-heading">
+                        <strong>总任务</strong>
+                    </div>
+                    <div class="panel-body">
+                        <div class="board-list">
+                            {% for j in  all %}
+                                <div class="board-item">{{ j.content }} ({{ j.date }})</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="board panel panel-success">
+                    <div class="panel-heading">
+                        <strong>已完成</strong>
+                    </div>
+                    <div class="panel-body">
+                        <div class="board-list">
+                            {% for s in  success%}
+                                <div class="board-item">{{ s.content }} ({{ s.date }})</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            任务详情
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <fieldset disabled>
+                            <form class="form-horizontal">
+                                <div class="form-group" >
+                                    <label for="content" class="col-sm-2">任务标题</label>
+                                    <div class="col-md-6 col-sm-10">
+                                        <input type="text" class="form-control" id="editContent" placeholder="记录你将要做的一件事" >
+                                    </div>
+                                </div>
+                                <div class="form-group" style="color: deepskyblue">
+                                    <label for="time" class="col-sm-2">剩余时间</label>
+                                    <div class="col-md-6 col-sm-10">
+                                        <input type="text" class="form-control" id="editExcept">
+                                    </div>
+                                </div>
+                            </form>
+                        </fieldset>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-success" id="end" style="margin-left: 10px">完成</button>
+                            <button type="button" class="btn btn-default"  id="editExit" data-dismiss="modal" style="margin-left:350px">取消</button>
+                        </div>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        <div class="contribute">
+            <p style="font-size: 20px; margin-left:40px;margin-top: 20px; ">任务贡献</p>
+        </div>
+    </div>
+
+    <script type="application/ecmascript">
+
+    </script>
+
+{% endblock %}

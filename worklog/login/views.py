@@ -12,8 +12,6 @@ from admin.email_base import email
 from admin.models import Captch
 from login.models import Profile
 
-def upload(req):
-    return render(req, "login/FileUpload.html")
 def get_userinfo(req):
     user_id = req.session.get("user_id")
     user = User.objects.get(id=user_id)
@@ -50,7 +48,7 @@ def page_error(request):
 
 
 def welcome(req):
-    is_login = req.session.get('is_login', False)
+    is_login = req.session.get('status', False)
     # 如果为真，就说明用户是正常登陆的
     if is_login:
         # 获取字典的内容并传入页面文件
@@ -60,10 +58,10 @@ def welcome(req):
         如果访问的时候没有携带正确的session，
         就直接被重定向url回login页面
         """
-        return render(req, "login/login.html")
-
-def login(req):
+        return redirect("tologin")
+def tologin(req):
     return render(req, "login/login.html")
+
 def index(req):
     return render(req, "user_base.html")
 
@@ -84,12 +82,10 @@ def user_login(req):
                 return render(req, 'login/login.html', {"user_error": "用户名和密码不匹配"})
         if user is not None:
             user_id = user.id
-            if status == None:
-                req.session['is_login'] = False
-                req.session['status'] = False
-            req.session['is_login'] = True
             req.session['user_id'] = user_id
             req.session['status'] = True
+            if status == None:
+                req.session['status'] = False
             # 登陆成功就跳转到用户首页
             return redirect("index")
         else:
@@ -106,7 +102,8 @@ def user_logout(req):
     """
     try:
         # 删除is_login对应的value值
-        del req.session['is_login']
+        del req.session['status']
+        del req.session['user_id']
     except KeyError:
         pass
     # 点击注销之后，直接重定向回登录页面
@@ -224,7 +221,6 @@ def user_regist(req):
                 )
                 user.save()
                 profile.save()
-                req.session['is_login'] = True
                 req.session['user_id'] = user.id
                 req.session['status'] = False
                 del req.session["email"]
@@ -288,6 +284,33 @@ def test_captch(req):
     else:
         return render(req, "login/test_captch.html", {"error": "验证码不正确"})
 
+#任务提醒
+def task_notice():
+    from datetime import datetime
+    now = datetime.now()
+    task = []
+    from mycalendar.models import calendar
+    obj = calendar.objects.all()
+    for o in obj:
+        end = (o.end_time - now)
+        if end.days > 0:
+            end = end.seconds/3600
+            if end <= 1:
+                dic = dict()
+                dic["user"] = o.auth_id
+                dic["task"] = o.content
+                task.append(dic)
+    if len(task) != 0:
+        for t in task:
+            notice = workEmail()
+            user_obj = User.objects.get(id=t["user"])
+            email = user_obj.email
+            name = user_obj.profile.name
+            content = name + ",您好,您的任务:" + t['task'] + ",即将过期,请尽快完成！"
+            notice.setTitle("任务即将过期提醒邮件")
+            notice.setContent(content)
+            notice.set_to(email)
+            notice.send_email()
 
 
 

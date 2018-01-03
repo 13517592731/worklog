@@ -32,9 +32,9 @@
     </div>
 </div>
 <script type="text/javascript" src="{% static 'zui/js/jquery.js' %}"></script>
-<script type="text/javascript" src="{% static 'zui/js/selectFilter.js' %}"></script>
 <script>
     $(document).ready(function(){
+        var id = {{ id }};
         $.show_data = function(url, data){
             $.getJSON(
                 url,
@@ -82,7 +82,7 @@
         //获取当前年
         var year=myDate.getFullYear();
         $("#year_number").html(year);
-        $.show_data("{% url 'time_show' %}", year);
+        $.show_data("{% url 'time_show' %}?id="+{{ id }}, year);
         $("#left").click(function(){
             var str = $("#year_number").html();
             year = parseInt(str) - 1;

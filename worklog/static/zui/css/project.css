@@ -1,0 +1,105 @@
+﻿#wraps{
+	margin: 30px auto;
+	width:85%;
+	filter:progid:DXImageTransform.Microsoft.Shadow(color=#909090,direction=120,strength=4);
+        -moz-box-shadow: 2px 2px 10px #909090;
+        -webkit-box-shadow: 2px 2px 10px #909090;
+        box-shadow:2px 2px 10px #909090;
+}
+#myproject1{
+	width:100%;
+    min-height: 600px;
+    margin-left: 3%;
+
+}
+
+.projects-tools {
+    padding: 20px 30px 30px;
+    font-size: 14px;
+}
+.project-groups {
+    line-height: 36px;
+}
+.project-groups .project-group {
+    display: inline-block;
+    margin: 0 4px 10px 0;
+    max-width: 100px;
+    min-width: 20px;
+    padding: 0 12px;
+    line-height: 36px;
+    color: #555;
+    text-align: center;
+    border-radius: 20px;
+    background-color: #f0f0f0;
+    vertical-align: middle;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-decoration: none;
+}
+.project-groups .project-group-star.active {
+    background-color: #f6aa39;
+    color:#FFFFFF;
+}
+.project-groups .project-group-all.active {
+    pointer-events: none;
+    color: #fff;
+    background-color:#67b168;
+}
+.projects-tools .link-create-project {
+    border-right: 1px solid #ddd;
+    display: inline-block;
+    line-height: 36px;
+    margin-right: 5px;
+    padding: 0 10px;
+    vertical-align: top;
+}
+.project-tools-right {
+    float: right;
+}
+a{
+	color: #4ea5ad;
+    text-decoration: none;
+}
+#myproject1 .myprojects {
+    display: block;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    float: left;
+    position: relative;
+    margin-left: 5%;
+    text-decoration: none;
+}
+#myproject1 .myprojects:hover{
+   background: #f9f9f9;
+    border: 1px solid #eaeaea;
+    border-top-color: rgb(234, 234, 234);
+    border-top-style: solid;
+    border-top-width: 1px;
+}
+.myprojects .icon {
+    display: block;
+    width: 60px;
+    height: 60px;
+    margin: 15px auto 20px;
+    text-align: center;
+    font-family: "towericon";
+    font-style: normal;
+    background-color: transparent;
+    border-color: transparent;
+}
+.name{
+    display: block;
+    font-size: 17px;
+    color: #333333;
+    line-height: 20px;
+    text-align: center;
+    margin: 0 5px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
